@@ -58,7 +58,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		}
 
 		var user User
-		err := db.QueryRow(`Select id, username, password, created_at FROM users WHERE username = $1`, input.Username).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
+		err := db.QueryRow(`SELECT id, username, password, created_at FROM users WHERE username = $1`, input.Username).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
 
 		// Check if username is there
 		if err == sql.ErrNoRows {
