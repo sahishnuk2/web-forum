@@ -13,7 +13,7 @@ type User struct {
 	ID int				`json:"id"`
 	Username string		`json:"username" binding:"required,min=3,max=50"`
 	Password string		`json:"password" binding:"required,min=8"`
-	CreatedAt time.Time	`json: "created_at"`
+	CreatedAt time.Time	`json:"created_at"`
 }
 
 func SignUp(db * sql.DB) gin.HandlerFunc {
