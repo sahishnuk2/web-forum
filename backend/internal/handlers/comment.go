@@ -31,7 +31,7 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 		}
 		defer rows.Close()
 
-		var comments []Comment
+		comments := make([]Comment, 0)
 		for rows.Next() {
 			var comment Comment
 			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt); err != nil {

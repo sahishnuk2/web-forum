@@ -15,6 +15,10 @@ func SetUpRouter() *gin.Engine {
 	db := database.GetDB()
 
 	// Define routes
+	router.GET("/", func(c *gin.Context) {
+    	c.JSON(200, gin.H{"message": "Welcome to Web Forum API"})
+  	})
+	
 	// Users
 	router.POST("/api/users/signup", handlers.SignUp(db))
 	router.POST("/api/users/login", handlers.Login(db))

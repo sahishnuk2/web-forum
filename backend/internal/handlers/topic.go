@@ -24,7 +24,7 @@ func GetTopics(db *sql.DB) gin.HandlerFunc {
 		}
 		defer rows.Close()
 
-		var topics []Topic
+		topics := make([]Topic, 0)
 		for rows.Next() {
 			var topic Topic
 			if err := rows.Scan(&topic.ID, &topic.Title, &topic.CreatedBy, &topic.CreatedAt); err != nil {

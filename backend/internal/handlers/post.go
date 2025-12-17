@@ -33,7 +33,7 @@ func GetPosts(db *sql.DB) gin.HandlerFunc {
 		}
 		defer rows.Close()
 
-		var posts []Post
+		posts := make([]Post, 0)
 		for rows.Next() {
 			var post Post
 			if err := rows.Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt); err != nil {
