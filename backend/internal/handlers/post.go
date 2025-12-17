@@ -73,6 +73,41 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
 
 func DeletePost(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		id := c.Param("id")
 
+		var input struct {
+			UserID int `json:"user_id"`
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			return
+		}
+
+		var createdBy int
+		err := db.QueryRow(`SELECT created_by FROM posts WHERE id = $1`, id).Scan(&createdBy)
+
+		if err == sql.ErrNoRows {
+      		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+      		return
+  		}
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve post"})
+            return
+		}
+
+		if createdBy != input.UserID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete posts created by you"})
+            return
+		}
+
+		_, err = db.Exec(`DELETE FROM posts WHERE id = $1`, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete post"})
+            return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Post deleted successfully"})
 	}
 }
