@@ -104,7 +104,7 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "Posted edited successfully"})
+		c.JSON(http.StatusOK, gin.H{"message": "Post edited successfully"})
 	}
 }
 
