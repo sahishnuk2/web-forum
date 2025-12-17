@@ -67,7 +67,44 @@ func CreatePost(db *sql.DB) gin.HandlerFunc {
 
 func UpdatePost(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		id := c.Param("id")
 
+		var input struct {
+			Title string	`json:"title" binding:"required"`
+			Content string	`json:"content" binding:"required"`
+			UserID int 		`json:"user_id"`
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			return
+		}
+
+		var createdBy int
+		err := db.QueryRow(`SELECT created_by FROM posts WHERE id = $1`, id).Scan(&createdBy)
+
+		if err == sql.ErrNoRows {
+      		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+      		return
+  		}
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve post"})
+            return
+		}
+
+		if createdBy != input.UserID {
+			c.JSON(http.StatusForbidden, gin.H{"error": "You can only edit posts created by you"})
+            return
+		}
+
+		_, err = db.Exec(`UPDATE posts SET title = $1, content = $2 WHERE id = $3`, input.Title, input.Content, id)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit post"})
+            return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Posted edited successfully"})
 	}
 }
 
