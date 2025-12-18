@@ -4,12 +4,15 @@ import (
 	"web-forum/internal/database"
 	"web-forum/internal/handlers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func SetUpRouter() *gin.Engine {
 	// Create a new gin router
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	// Get database to connect
 	db := database.GetDB()
