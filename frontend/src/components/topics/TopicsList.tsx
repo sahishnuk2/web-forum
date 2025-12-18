@@ -1,33 +1,16 @@
 import type { Topic } from "../../types";
 import TopicCard from "./TopicCard";
+import { useEffect, useState } from "react";
 
 function TopicsList() {
-  const topics: Topic[] = [
-    {
-      id: 1,
-      title: "Java",
-      created_by: 1,
-      created_at: "2024-01-01T10:00:00Z",
-    },
-    {
-      id: 2,
-      title: "JavaScript",
-      created_by: 2,
-      created_at: "2024-01-02T14:30:00Z",
-    },
-    {
-      id: 3,
-      title: "Go",
-      created_by: 1,
-      created_at: "2024-01-03T09:15:00Z",
-    },
-    {
-      id: 4,
-      title: "Python",
-      created_by: 3,
-      created_at: "2024-01-04T16:45:00Z",
-    },
-  ];
+  const [topics, setTopics] = useState<Topic[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/topics")
+      .then((response) => response.json())
+      .then((data) => setTopics(data))
+      .catch((error) => console.error("Error fetching topics:", error));
+  }, []);
 
   return (
     <div>
