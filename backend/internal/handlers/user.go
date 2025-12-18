@@ -22,7 +22,7 @@ func SignUp(db * sql.DB) gin.HandlerFunc {
 		
 		// Check if username and password are valid
 		if err := c.BindJSON(&user); err != nil {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input. Username and password required"})
+            c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input. Username and password invalid"})
             return
         }
 

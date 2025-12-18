@@ -40,7 +40,6 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-
         <button type="submit">Login</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
