@@ -1,10 +1,10 @@
 import "./App.css";
-import TopicsList from "./components/topics/TopicsList";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
     <>
-      <TopicsList></TopicsList>
+      <LoginPage></LoginPage>
     </>
   );
 }

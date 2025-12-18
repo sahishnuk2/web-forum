@@ -1,3 +1,4 @@
+import { fetchTopics } from "../../services/api";
 import type { Topic } from "../../types";
 import TopicCard from "./TopicCard";
 import { useEffect, useState } from "react";
@@ -6,8 +7,7 @@ function TopicsList() {
   const [topics, setTopics] = useState<Topic[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/topics")
-      .then((response) => response.json())
+    fetchTopics()
       .then((data) => setTopics(data))
       .catch((error) => console.error("Error fetching topics:", error));
   }, []);
