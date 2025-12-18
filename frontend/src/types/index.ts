@@ -17,6 +17,7 @@ export interface Topic {
 // Post
 export interface Post {
   id: number;
+  topic_id: number;
   title: string;
   content: string;
   created_by: number;
@@ -26,6 +27,7 @@ export interface Post {
 // Comment
 export interface Comment {
   id: number;
+  post_id: number;
   content: string;
   created_by: number;
   created_at: string;

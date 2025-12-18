@@ -1,0 +1,13 @@
+.topic-card {
+  border: 1px solid black;
+  margin: 10px auto;
+  width: 50%;
+  max-width: 600px;
+  border-radius: 20px;
+  background-color: #0096aa;
+}
+
+.topic-card:hover {
+  cursor: pointer;
+  background-color: #008494;
+}
