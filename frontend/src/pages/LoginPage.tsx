@@ -2,11 +2,13 @@ import { useState } from "react";
 import { login } from "../services/api";
 import "./Authentication.css";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  let navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -15,6 +17,7 @@ function LoginPage() {
       const data = await login(username, password);
       console.log(data); // remove later
       localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/topics");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

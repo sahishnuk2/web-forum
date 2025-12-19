@@ -3,6 +3,8 @@ import "./App.css";
 import SignUpPage from "./pages/SignUpPage";
 import LoginPage from "./pages/LoginPage";
 import ErrorPage from "./pages/ErrorPage";
+import TopicsPage from "./pages/TopicsPage";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   return (
@@ -11,6 +13,11 @@ function App() {
         <Route path="/" element={<LoginPage />}></Route>
         <Route path="/login" element={<LoginPage />}></Route>
         <Route path="/signup" element={<SignUpPage />}></Route>
+        {/* Protected - need user authentication */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/topics" element={<TopicsPage />} />
+        </Route>
+        {/* Invalid Routes */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </Router>
