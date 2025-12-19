@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { signUp } from "../services/api";
 import "./Authentication.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -14,6 +15,7 @@ function SignUpPage() {
     try {
       const data = await signUp(username, password);
       console.log(data);
+      navigate("/login");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);

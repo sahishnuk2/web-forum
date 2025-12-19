@@ -45,7 +45,7 @@ function CreateTopicPage() {
         </div>
         <div>
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <div className="buttons">
+          <div className="submissions">
             <button type="button" onClick={() => navigate("/topics")}>
               Back
             </button>
