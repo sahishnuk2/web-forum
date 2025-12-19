@@ -22,7 +22,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "noImplicitReturns": true, // Add this
+    "noUncheckedIndexedAccess": true, // Add this - arrays might be undefined
+    "exactOptionalPropertyTypes": true, // Add this - strict optional properties
+    "noPropertyAccessFromIndexSignature": true // Add this
   },
   "include": ["src"]
 }

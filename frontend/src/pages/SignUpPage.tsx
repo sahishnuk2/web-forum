@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { signUp } from "../services/api";
+import "./Authentication.css";
+import { Link } from "react-router-dom";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -20,10 +22,10 @@ function SignUpPage() {
   }
 
   return (
-    <div>
-      <h1>Sign Up</h1>
+    <div className="authentication">
       <form onSubmit={handleSubmit}>
-        <div>
+        <h1>Sign Up</h1>
+        <div className="input">
           <label>Username</label>
           <input
             type="text"
@@ -31,7 +33,7 @@ function SignUpPage() {
             onChange={(e) => setUsername(e.target.value)}
           />
         </div>
-        <div>
+        <div className="input">
           <label>Password</label>
           <input
             type="password"
@@ -39,8 +41,16 @@ function SignUpPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Sign Up</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className="buttons">
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <button type="submit">Sign Up</button>
+          <p>
+            Already have an account?
+            <Link to="/login" className="login-link">
+              Login
+            </Link>
+          </p>
+        </div>
       </form>
     </div>
   );
