@@ -1,0 +1,60 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createTopic } from "../services/api";
+import "./CreateTopicPage.css";
+
+function CreateTopicPage() {
+  const [title, setTitle] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    const userStr = localStorage.getItem("user");
+    const user = userStr ? JSON.parse(userStr) : null;
+    const createdBy = user?.id;
+
+    if (!createdBy) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const data = await createTopic(title, Number(createdBy));
+      console.log(data); // to remove later
+      navigate("/topics");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
+    }
+  }
+
+  return (
+    <div className="create-topic">
+      <form onSubmit={handleSubmit}>
+        <h1>Create new topic</h1>
+        <div className="input">
+          <label>Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+        <div>
+          {error && <p style={{ color: "red" }}>{error}</p>}
+          <div className="buttons">
+            <button type="button" onClick={() => navigate("/topics")}>
+              Back
+            </button>
+            <button type="submit">Create</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export default CreateTopicPage;

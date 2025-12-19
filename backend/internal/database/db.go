@@ -60,7 +60,7 @@ func initUserTable() {
 func initTopicTable() {
 	createTableQuery := `CREATE TABLE IF NOT EXISTS topics (
 		id          SERIAL PRIMARY KEY,
-		title       VARCHAR(255) NOT NULL,
+		title       VARCHAR(255) UNIQUE NOT NULL,
 		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
 		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);`
