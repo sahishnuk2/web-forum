@@ -13,11 +13,11 @@ func main() {
 
 	port := os.Getenv("PORT")
     if port == "" {
-        port = ":8080"  // Default port
+        port = "8080"  // Default port
     }
-	log.Printf("Server is running on http://localhost%s", port)
+	log.Printf("Server is running on http://localhost:%s", port)
 
-	if err := r.Run(port); err != nil {
+	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Error starting server: %s", err)
 	}
 }
