@@ -21,6 +21,12 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/", func(c *gin.Context) {
     	c.JSON(200, gin.H{"message": "Welcome to Web Forum API"})
   	})
+
+	// For Render
+	router.GET("/healthz", func(c *gin.Context) {
+  		c.JSON(200, gin.H{"status": "ok"})
+	})
+
 	
 	// Users
 	router.POST("/api/users/signup", handlers.SignUp(db))
