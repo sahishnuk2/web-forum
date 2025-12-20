@@ -1,6 +1,6 @@
 module web-forum
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/bytedance/sonic v1.14.0 // indirect
