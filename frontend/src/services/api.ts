@@ -107,3 +107,15 @@ export const createPost = async (
 
   return await response.json();
 };
+
+// Comments
+export const fetchComments = async (post_id: number) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/comments?post_id=${post_id}`
+  );
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to retrieve posts");
+  }
+  return await response.json();
+};

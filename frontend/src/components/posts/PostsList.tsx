@@ -13,7 +13,7 @@ function PostsList({ topic_id }: PostsListProp) {
   useEffect(() => {
     fetchPosts(topic_id)
       .then((data) => setPosts(data))
-      .catch((error) => console.error("Error fetching posts:", error));
+      .catch((error) => console.error("Error fetching posts: ", error));
   }, [topic_id]);
 
   return (
