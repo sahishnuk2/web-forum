@@ -8,6 +8,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import CreateTopicPage from "./pages/CreateTopicPage";
 import PostsPage from "./pages/PostsPage";
 import CreatePostPage from "./pages/CreatePostPage";
+import CommentsPage from "./pages/CommentsPage";
 
 function App() {
   return (
@@ -20,8 +21,9 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/topics" element={<TopicsPage />} />
           <Route path="/topics/create" element={<CreateTopicPage />} />
-          <Route path="/posts/:topic_id" element={<PostsPage />} />
-          <Route path="/posts/:topic_id/create" element={<CreatePostPage />} />
+          <Route path="/topics/:topic_id" element={<PostsPage />} />
+          <Route path="/topics/:topic_id/create" element={<CreatePostPage />} />
+          <Route path="/topics/:topic_id/:post_id" element={<CommentsPage />} />
         </Route>
         {/* Invalid Routes */}
         <Route path="*" element={<ErrorPage />} />

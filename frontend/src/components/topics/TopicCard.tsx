@@ -6,7 +6,7 @@ function TopicCard({ id, title, created_by }: Topic) {
   const navigate = useNavigate();
 
   return (
-    <div className="topic-card" onClick={() => navigate(`/posts/${id}`)}>
+    <div className="topic-card" onClick={() => navigate(`/topics/${id}`)}>
       <h2>{title}</h2>
       {created_by}
     </div>
