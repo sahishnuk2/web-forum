@@ -9,6 +9,7 @@ import CreateTopicPage from "./pages/CreateTopicPage";
 import PostsPage from "./pages/PostsPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import CommentsPage from "./pages/CommentsPage";
+import CreateCommentPage from "./pages/CreateCommentPage";
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
           <Route path="/topics/:topic_id" element={<PostsPage />} />
           <Route path="/topics/:topic_id/create" element={<CreatePostPage />} />
           <Route path="/topics/:topic_id/:post_id" element={<CommentsPage />} />
+          <Route
+            path="/topics/:topic_id/:post_id/create"
+            element={<CreateCommentPage />}
+          />
         </Route>
         {/* Invalid Routes */}
         <Route path="*" element={<ErrorPage />} />

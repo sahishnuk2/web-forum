@@ -115,7 +115,31 @@ export const fetchComments = async (post_id: number) => {
   );
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve posts");
+    throw new Error(errorData.error || "Failed to retrieve comments");
+  }
+  return await response.json();
+};
+
+export const createComment = async (
+  post_id: number,
+  content: string,
+  created_by: number
+) => {
+  const response = await fetch(`${API_BASE_URL}/api/comments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      post_id,
+      content,
+      created_by,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create comment");
   }
   return await response.json();
 };
