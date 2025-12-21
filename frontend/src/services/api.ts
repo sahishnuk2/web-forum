@@ -80,3 +80,30 @@ export const fetchPosts = async (topicId: number) => {
   }
   return await response.json();
 };
+
+export const createPost = async (
+  topic_id: number,
+  title: string,
+  content: string,
+  created_by: number
+) => {
+  const response = await fetch(`${API_BASE_URL}/api/posts`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      topic_id,
+      title,
+      content,
+      created_by,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to create post");
+  }
+
+  return await response.json();
+};

@@ -7,6 +7,7 @@ import TopicsPage from "./pages/TopicsPage";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import CreateTopicPage from "./pages/CreateTopicPage";
 import PostsPage from "./pages/PostsPage";
+import CreatePostPage from "./pages/CreatePostPage";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/topics" element={<TopicsPage />} />
           <Route path="/topics/create" element={<CreateTopicPage />} />
           <Route path="/posts/:topic_id" element={<PostsPage />} />
+          <Route path="/posts/:topic_id/create" element={<CreatePostPage />} />
         </Route>
         {/* Invalid Routes */}
         <Route path="*" element={<ErrorPage />} />

@@ -1,4 +1,5 @@
-.create-topic {
+.create-topic,
+.create-post {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -6,7 +7,8 @@
   min-height: 100vh;
 }
 
-.create-topic form {
+.create-topic,
+.create-post form {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -17,7 +19,8 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-.create-topic h1 {
+.create-topic,
+.create-post h1 {
   margin-top: 0;
   margin-bottom: 0px;
 }
