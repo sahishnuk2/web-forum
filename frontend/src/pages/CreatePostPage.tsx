@@ -27,7 +27,7 @@ function CreatePostPage() {
     try {
       const data = await createPost(topicId, title, content, createdBy);
       console.log(data); // to remove later
-      navigate(`/posts/${topicId}`);
+      navigate(`/topics/${topicId}`);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -58,7 +58,10 @@ function CreatePostPage() {
         <div>
           {error && <p style={{ color: "red" }}>{error}</p>}
           <div className="submissions">
-            <button type="button" onClick={() => navigate(`/posts/${topicId}`)}>
+            <button
+              type="button"
+              onClick={() => navigate(`/topics/${topicId}`)}
+            >
               Back
             </button>
             <button type="submit">Create</button>
