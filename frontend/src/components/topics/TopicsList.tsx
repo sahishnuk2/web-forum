@@ -14,7 +14,6 @@ function TopicsList() {
 
   return (
     <div>
-      <h1>Topics</h1>
       {topics.map((topic) => (
         <TopicCard
           key={topic.id}
