@@ -108,6 +108,51 @@ export const createPost = async (
   return await response.json();
 };
 
+export const editPost = async (
+  post_id: number,
+  title: string,
+  content: string,
+  user_id: number
+) => {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title,
+      content,
+      user_id,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to edit post");
+  }
+
+  return await response.json();
+};
+
+export const deletePost = async (post_id: number, user_id: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete post");
+  }
+
+  return await response.json();
+};
+
 // Comments
 export const fetchComments = async (post_id: number) => {
   const response = await fetch(

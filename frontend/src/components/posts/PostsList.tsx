@@ -19,10 +19,26 @@ function PostsList({ topic_id }: PostsListProp) {
   return (
     <div>
       {posts.map((post) => (
-        <PostCard key={post.id} {...post} />
+        <PostCard
+          key={post.id}
+          {...post}
+          currentUserId={getCurrentUserId()}
+          onDelete={() =>
+            setPosts((prev) => prev.filter((p) => p.id !== post.id))
+          }
+        />
       ))}
     </div>
   );
 }
 
 export default PostsList;
+
+// User must be present
+function getCurrentUserId(): number {
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+  const createdBy = user?.id;
+
+  return createdBy;
+}

@@ -23,13 +23,6 @@ function SignUpPage() {
     }
   }
 
-  useEffect(() => {
-    const userId = localStorage.getItem("user");
-    if (userId) {
-      navigate("/topics");
-    }
-  }, []);
-
   return (
     <div className="authentication">
       <form onSubmit={handleSubmit}>
