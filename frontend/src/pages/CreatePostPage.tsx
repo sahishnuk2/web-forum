@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createPost } from "../services/api";
 import "./CreateTopicPage.css";
+import { Alert } from "@mui/material";
 
 function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -56,7 +57,24 @@ function CreatePostPage() {
           />
         </div>
         <div>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && (
+            <Alert
+              variant="outlined"
+              severity="error"
+              sx={{
+                color: "red",
+                borderColor: "red",
+                mb: 1,
+                "& .MuiAlert-icon": {
+                  color: "red",
+                },
+                paddingTop: 0,
+                paddingBottom: 0,
+              }}
+            >
+              {error}
+            </Alert>
+          )}
           <div className="submissions">
             <button
               type="button"

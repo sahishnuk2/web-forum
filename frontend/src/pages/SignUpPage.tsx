@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signUp } from "../services/api";
 import "./Authentication.css";
 import { Link, useNavigate } from "react-router-dom";
+import { Alert } from "@mui/material";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -44,7 +45,24 @@ function SignUpPage() {
           />
         </div>
         <div className="buttons">
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          {error && (
+            <Alert
+              variant="outlined"
+              severity="error"
+              sx={{
+                color: "red",
+                borderColor: "red",
+                mb: 1,
+                "& .MuiAlert-icon": {
+                  color: "red",
+                },
+                paddingTop: 0,
+                paddingBottom: 0,
+              }}
+            >
+              {error}
+            </Alert>
+          )}
           <button type="submit">SIGN UP</button>
           <p>
             Already have an account?
