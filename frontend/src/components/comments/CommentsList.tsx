@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CommentCard from "./CommentCard";
 import type { Comment } from "../../types";
 import { fetchComments } from "../../services/api";
+import getCurrentUserId from "../common/Functions";
 
 interface CommentsListProp {
   post_id: number;
@@ -33,13 +34,3 @@ function CommentsList({ post_id }: CommentsListProp) {
 }
 
 export default CommentsList;
-
-// Duplicated from PostList, can put this func under common later
-// TODO
-function getCurrentUserId(): number {
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
-  const createdBy = user?.id;
-
-  return createdBy;
-}

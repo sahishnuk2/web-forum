@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { login } from "../services/api";
-import "./Authentication.css";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -54,7 +53,7 @@ function LoginPage() {
         </div>
         <div className="buttons">
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <button type="submit">Login</button>
+          <button type="submit">LOGIN</button>
           <p>
             Don't have an account?
             <Link to="/signup" className="signup-link">

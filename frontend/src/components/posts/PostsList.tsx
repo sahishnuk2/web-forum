@@ -2,6 +2,7 @@ import type { Post } from "../../types";
 import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { fetchPosts } from "../../services/api";
+import getCurrentUserId from "../common/Functions";
 
 interface PostsListProp {
   topic_id: number;
@@ -33,12 +34,3 @@ function PostsList({ topic_id }: PostsListProp) {
 }
 
 export default PostsList;
-
-// User must be present
-function getCurrentUserId(): number {
-  const userStr = localStorage.getItem("user");
-  const user = userStr ? JSON.parse(userStr) : null;
-  const createdBy = user?.id;
-
-  return createdBy;
-}

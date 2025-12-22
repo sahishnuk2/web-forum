@@ -45,7 +45,7 @@ function SignUpPage() {
         </div>
         <div className="buttons">
           {error && <p style={{ color: "red" }}>{error}</p>}
-          <button type="submit">Sign Up</button>
+          <button type="submit">SIGN UP</button>
           <p>
             Already have an account?
             <Link to="/login" className="login-link">
