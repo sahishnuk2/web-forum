@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { signUp } from "../services/api";
 import "./Authentication.css";
 import { Link, useNavigate } from "react-router-dom";
