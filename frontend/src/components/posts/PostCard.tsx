@@ -19,6 +19,7 @@ function PostCard({
   async function handleEdit(e: React.MouseEvent) {
     e.stopPropagation();
     setError("");
+    navigate(`${id}/edit`);
   }
 
   async function handleDelete(e: React.MouseEvent) {

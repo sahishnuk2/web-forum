@@ -10,6 +10,7 @@ import PostsPage from "./pages/PostsPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import CommentsPage from "./pages/CommentsPage";
 import CreateCommentPage from "./pages/CreateCommentPage";
+import EditPostPage from "./pages/EditPostPage";
 
 function App() {
   return (
@@ -24,6 +25,10 @@ function App() {
           <Route path="/topics/create" element={<CreateTopicPage />} />
           <Route path="/topics/:topic_id" element={<PostsPage />} />
           <Route path="/topics/:topic_id/create" element={<CreatePostPage />} />
+          <Route
+            path="/topics/:topic_id/:post_id/edit"
+            element={<EditPostPage />}
+          />
           <Route path="/topics/:topic_id/:post_id" element={<CommentsPage />} />
           <Route
             path="/topics/:topic_id/:post_id/create"
