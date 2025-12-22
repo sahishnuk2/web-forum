@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../services/api";
 import "./Authentication.css";
 import { Link } from "react-router-dom";
@@ -24,6 +24,13 @@ function LoginPage() {
       }
     }
   }
+
+  useEffect(() => {
+    const userId = localStorage.getItem("user");
+    if (userId) {
+      navigate("/topics");
+    }
+  }, []);
 
   return (
     <div className="authentication">

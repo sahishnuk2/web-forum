@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signUp } from "../services/api";
 import "./Authentication.css";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,6 +22,13 @@ function SignUpPage() {
       }
     }
   }
+
+  useEffect(() => {
+    const userId = localStorage.getItem("user");
+    if (userId) {
+      navigate("/topics");
+    }
+  }, []);
 
   return (
     <div className="authentication">
