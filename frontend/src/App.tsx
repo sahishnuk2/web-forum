@@ -11,6 +11,7 @@ import CreatePostPage from "./pages/CreatePostPage";
 import CommentsPage from "./pages/CommentsPage";
 import CreateCommentPage from "./pages/CreateCommentPage";
 import EditPostPage from "./pages/EditPostPage";
+import EditCommentPage from "./pages/EditCommentPage";
 
 function App() {
   return (
@@ -33,6 +34,10 @@ function App() {
           <Route
             path="/topics/:topic_id/:post_id/create"
             element={<CreateCommentPage />}
+          />
+          <Route
+            path="/topics/:topic_id/:post_id/comments/:comment_id/edit"
+            element={<EditCommentPage />}
           />
         </Route>
         {/* Invalid Routes */}

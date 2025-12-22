@@ -188,3 +188,46 @@ export const createComment = async (
   }
   return await response.json();
 };
+
+export const editComment = async (
+  comment_id: number,
+  content: string,
+  user_id: number
+) => {
+  const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      content,
+      user_id,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to edit comment");
+  }
+
+  return await response.json();
+};
+
+export const deleteComment = async (comment_id: number, user_id: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      user_id,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to delete comment");
+  }
+
+  return await response.json();
+};

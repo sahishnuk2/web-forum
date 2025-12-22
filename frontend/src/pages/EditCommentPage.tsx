@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { editPost } from "../services/api";
+import { editComment } from "../services/api";
 import "./CreateTopicPage.css";
 
-function EditPostPage() {
-  const [title, setTitle] = useState("");
+function EditCommentPage() {
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const { topic_id, post_id } = useParams();
+  const { topic_id, comment_id, post_id } = useParams();
   const topicId = Number(topic_id);
   const postId = Number(post_id);
+  const commentId = Number(comment_id);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,9 +21,9 @@ function EditPostPage() {
     const createdBy = user?.id;
 
     try {
-      const data = await editPost(postId, title, content, createdBy);
+      const data = await editComment(commentId, content, createdBy);
       console.log(data); // to remove later
-      navigate(`/topics/${topicId}`);
+      navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -32,17 +32,9 @@ function EditPostPage() {
   }
 
   return (
-    <div className="edit-post">
+    <div className="edit-comment">
       <form onSubmit={handleSubmit}>
-        <h1>Edit post</h1>
-        <div className="input">
-          <label>Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
+        <h1>Edit comment</h1>
         <div className="input">
           <label>Content</label>
           <textarea
@@ -56,7 +48,7 @@ function EditPostPage() {
           <div className="submissions">
             <button
               type="button"
-              onClick={() => navigate(`/topics/${topicId}`)}
+              onClick={() => navigate(`/topics/${topicId}/${postId}`)}
             >
               Back
             </button>
@@ -68,4 +60,4 @@ function EditPostPage() {
   );
 }
 
-export default EditPostPage;
+export default EditCommentPage;
