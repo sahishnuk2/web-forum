@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
-import { Alert } from "@mui/material";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 function CreateCommentPage() {
   const [content, setContent] = useState("");
@@ -47,24 +47,7 @@ function CreateCommentPage() {
           />
         </div>
         <div>
-          {error && (
-            <Alert
-              variant="outlined"
-              severity="error"
-              sx={{
-                color: "red",
-                borderColor: "red",
-                mb: 1,
-                "& .MuiAlert-icon": {
-                  color: "red",
-                },
-                paddingTop: 0,
-                paddingBottom: 0,
-              }}
-            >
-              {error}
-            </Alert>
-          )}
+          {error && <ErrorMessage error={error} />}
           <div className="submissions">
             <button
               type="button"

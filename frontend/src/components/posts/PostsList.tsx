@@ -18,7 +18,7 @@ function PostsList({ topic_id }: PostsListProp) {
   }, [topic_id]);
 
   return (
-    <div>
+    <div style={{ alignContent: "center" }}>
       {posts.map((post) => (
         <PostCard
           key={post.id}

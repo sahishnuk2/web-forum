@@ -1,8 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import type { Post } from "../../types";
-import "./PostCard.css";
 import { deletePost } from "../../services/api";
 import { useState } from "react";
+import ErrorMessage from "../common/ErrorMessage";
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+} from "@mui/material";
 
 function PostCard({
   id,
@@ -29,9 +37,8 @@ function PostCard({
     }
     setError("");
     try {
-      const data = await deletePost(id, currentUserId);
+      await deletePost(id, currentUserId);
       onDelete();
-      console.log(data);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -40,25 +47,69 @@ function PostCard({
   }
 
   return (
-    <>
-      <div
-        className="post-card"
-        onClick={() => navigate(`/topics/${topic_id}/${id}`)}
-      >
-        <h2>{title}</h2>
-        <p>{content}</p>
-        id: {id} created_by: {created_by}
-        <div>
-          {created_by === currentUserId && (
-            <button onClick={handleEdit}>Edit</button>
-          )}
-          {created_by === currentUserId && (
-            <button onClick={handleDelete}>Delete</button>
-          )}
-          {error && <p style={{ color: "red" }}>{error}</p>}
-        </div>
-      </div>
-    </>
+    <Card
+      sx={{
+        maxWidth: 800,
+        width: "75%",
+        margin: "16px auto",
+        backgroundColor: "inherit",
+        color: "inherit",
+        // border: "1px solid #006f80",
+        boxShadow: 6,
+        // boxShadow: "0 4px 8px rgba(0, 150, 170, 0.2)",
+        // boxShadow: "0 2px 8px rgba(0, 150, 170, 0.3)",
+      }}
+    >
+      <CardContent>
+        <Typography variant="h5" sx={{ textAlign: "left" }}>
+          {title}
+        </Typography>
+      </CardContent>
+      <CardContent>
+        <Typography variant="body2" sx={{ textAlign: "left" }}>
+          {content}
+        </Typography>
+      </CardContent>
+      <CardActions sx={{ justifyContent: "space-between" }}>
+        <Button
+          variant="text"
+          size="small"
+          onClick={() => navigate(`/topics/${topic_id}/${id}`)}
+          sx={{ color: "#006f80" }}
+        >
+          See comments
+        </Button>
+        {created_by === currentUserId && (
+          <Box>
+            <Button
+              variant="contained"
+              onClick={handleEdit}
+              size="small"
+              sx={{
+                margin: 1,
+                backgroundColor: "#006f80",
+                "&:hover": { backgroundColor: "#005f6e" },
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleDelete}
+              sx={{
+                margin: 1,
+                backgroundColor: "#006f80",
+                "&:hover": { backgroundColor: "#005f6e" },
+              }}
+            >
+              Delete
+            </Button>
+          </Box>
+        )}
+        {error && <ErrorMessage error={error} />}
+      </CardActions>
+    </Card>
   );
 }
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTopic } from "../services/api";
 import "./CreateTopicPage.css";
-import { Alert } from "@mui/material";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 function CreateTopicPage() {
   const [title, setTitle] = useState("");
@@ -45,24 +45,7 @@ function CreateTopicPage() {
           />
         </div>
         <div>
-          {error && (
-            <Alert
-              variant="outlined"
-              severity="error"
-              sx={{
-                color: "red",
-                borderColor: "red",
-                mb: 1,
-                "& .MuiAlert-icon": {
-                  color: "red",
-                },
-                paddingTop: 0,
-                paddingBottom: 0,
-              }}
-            >
-              {error}
-            </Alert>
-          )}
+          {error && <ErrorMessage error={error} />}
           <div className="submissions">
             <button type="button" onClick={() => navigate("/topics")}>
               Back

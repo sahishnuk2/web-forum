@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { login } from "../services/api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { Alert } from "@mui/material";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -53,24 +53,7 @@ function LoginPage() {
           />
         </div>
         <div className="buttons">
-          {error && (
-            <Alert
-              variant="outlined"
-              severity="error"
-              sx={{
-                color: "red",
-                borderColor: "red",
-                mb: 1,
-                "& .MuiAlert-icon": {
-                  color: "red",
-                },
-                paddingTop: 0,
-                paddingBottom: 0,
-              }}
-            >
-              {error}
-            </Alert>
-          )}
+          {error && <ErrorMessage error={error} />}
           <button type="submit">LOGIN</button>
           <p>
             Don't have an account?
