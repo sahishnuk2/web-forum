@@ -45,6 +45,29 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
+func GetComment(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		commentID := c.Param("id")
+
+		if commentID == "" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "comment_id is required"})
+            return
+		}
+		var comment Comment
+		err := db.QueryRow(`SELECT id, post_id, content, created_by, created_at FROM comments WHERE id = $1`, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt)
+		if err == sql.ErrNoRows {
+      		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+      		return
+  		}
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comment"})
+            return
+		}
+		c.JSON(http.StatusOK, comment)
+	}
+}
+
 func CreateComment(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var comment Comment

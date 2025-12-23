@@ -47,6 +47,30 @@ func GetPosts(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
+func GetPost(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		postID := c.Param("id")
+
+		if postID == "" {
+            c.JSON(http.StatusBadRequest, gin.H{"error": "post_id is required"})
+            return
+		}
+		var post Post
+		err := db.QueryRow(`SELECT id, topic_id, title, content, created_by, created_at FROM posts WHERE id = $1`, postID).Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt)
+
+		if err == sql.ErrNoRows {
+      		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+      		return
+  		}
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve post"})
+            return
+		}
+		c.JSON(http.StatusOK, post)
+	}
+}
+
 func CreatePost(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var post Post

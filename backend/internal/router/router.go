@@ -38,12 +38,14 @@ func SetUpRouter() *gin.Engine {
 
 	// Posts
 	router.GET("/api/posts", handlers.GetPosts(db))
+	router.GET("/api/posts/:id", handlers.GetPost(db))
 	router.POST("/api/posts", handlers.CreatePost(db))
 	router.PUT("/api/posts/:id", handlers.UpdatePost(db))
 	router.DELETE("/api/posts/:id", handlers.DeletePost(db))
 
 	// Comments
 	router.GET("/api/comments", handlers.GetComments(db))
+	router.GET("/api/comments/:id", handlers.GetComment(db))
 	router.POST("/api/comments", handlers.CreateComment(db))
 	router.PUT("/api/comments/:id", handlers.UpdateComments(db))
 	router.DELETE("/api/comments/:id", handlers.DeleteComments(db))
