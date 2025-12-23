@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { editPost } from "../services/api";
+import { editPost, fetchSinglePost } from "../services/api";
 import "./CreateTopicPage.css";
 
 function EditPostPage() {
@@ -12,6 +12,21 @@ function EditPostPage() {
   const { topic_id, post_id } = useParams();
   const topicId = Number(topic_id);
   const postId = Number(post_id);
+
+  useEffect(() => {
+    async function loadPost() {
+      try {
+        const data = await fetchSinglePost(postId);
+        setTitle(data.title);
+        setContent(data.content);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        }
+      }
+    }
+    loadPost();
+  }, [postId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
