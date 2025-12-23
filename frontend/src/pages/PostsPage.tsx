@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import PostsList from "../components/posts/PostsList";
 import { Button } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function PostsPage() {
   const navigate = useNavigate();
@@ -10,6 +11,11 @@ function PostsPage() {
   return (
     <>
       <div className="top">
+        <Button
+          startIcon={<ArrowBackIcon />}
+          sx={{ color: "#006f80" }}
+          onClick={() => navigate("/topics")}
+        />
         <h1>Posts</h1>
         <Button
           variant="contained"

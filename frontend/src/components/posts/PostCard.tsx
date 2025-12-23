@@ -54,10 +54,7 @@ function PostCard({
         margin: "16px auto",
         backgroundColor: "inherit",
         color: "inherit",
-        // border: "1px solid #006f80",
         boxShadow: 6,
-        // boxShadow: "0 4px 8px rgba(0, 150, 170, 0.2)",
-        // boxShadow: "0 2px 8px rgba(0, 150, 170, 0.3)",
       }}
     >
       <CardContent>

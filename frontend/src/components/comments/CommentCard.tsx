@@ -2,6 +2,15 @@ import type { Comment } from "../../types";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { deleteComment } from "../../services/api";
+import {
+  Card,
+  CardActions,
+  CardContent,
+  Typography,
+  Button,
+  Box,
+} from "@mui/material";
+import ErrorMessage from "../common/ErrorMessage";
 
 function CommentCard({
   id,
@@ -37,18 +46,65 @@ function CommentCard({
   }
 
   return (
-    <div className="comment-card">
-      <p>{content}</p>
-      <div>
+    // <div className="comment-card">
+    //   <p>{content}</p>
+    //   <div>
+    //     {created_by === currentUserId && (
+    //       <button onClick={handleEdit}>Edit</button>
+    //     )}
+    //     {created_by === currentUserId && (
+    //       <button onClick={handleDelete}>Delete</button>
+    //     )}
+    //     {error && <p style={{ color: "red" }}>{error}</p>}
+    //   </div>
+    // </div>
+    <Card
+      sx={{
+        maxWidth: 800,
+        width: "75%",
+        margin: "16px auto",
+        backgroundColor: "inherit",
+        color: "inherit",
+        boxShadow: 6,
+      }}
+    >
+      <CardContent>
+        <Typography variant="body2" sx={{ textAlign: "left" }}>
+          {content}
+        </Typography>
+      </CardContent>
+      <CardActions sx={{ justifyContent: "flex-end" }}>
         {created_by === currentUserId && (
-          <button onClick={handleEdit}>Edit</button>
+          <Box>
+            <Button
+              variant="contained"
+              onClick={handleEdit}
+              size="small"
+              sx={{
+                margin: 1,
+                backgroundColor: "#006f80",
+                "&:hover": { backgroundColor: "#005f6e" },
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={handleDelete}
+              sx={{
+                margin: 1,
+                backgroundColor: "#006f80",
+                "&:hover": { backgroundColor: "#005f6e" },
+              }}
+            >
+              Delete
+            </Button>
+          </Box>
         )}
-        {created_by === currentUserId && (
-          <button onClick={handleDelete}>Delete</button>
-        )}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-      </div>
-    </div>
+        {error && <ErrorMessage error={error} />}
+      </CardActions>
+    </Card>
   );
 }
 

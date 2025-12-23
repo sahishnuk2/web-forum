@@ -1,28 +1,5 @@
 .top {
-  position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 20px;
-}
-
-.top h1 {
-  margin: 0;
-}
-
-.top button {
-  position: absolute;
-  right: 20px;
-  width: 120px;
-  padding: 8px 16px;
-  cursor: pointer;
-  background-color: #006f80;
-  border-radius: 5px;
-  border: 2px solid #006f80;
-  color: whitesmoke;
-}
-
-.top button:hover {
-  background-color: #005f6e;
-  border: 2px solid #005f6e;
 }
