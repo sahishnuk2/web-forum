@@ -45,18 +45,6 @@ function CommentCard({
   }
 
   return (
-    // <div className="comment-card">
-    //   <p>{content}</p>
-    //   <div>
-    //     {created_by === currentUserId && (
-    //       <button onClick={handleEdit}>Edit</button>
-    //     )}
-    //     {created_by === currentUserId && (
-    //       <button onClick={handleDelete}>Delete</button>
-    //     )}
-    //     {error && <p style={{ color: "red" }}>{error}</p>}
-    //   </div>
-    // </div>
     <Card
       sx={{
         maxWidth: 800,
