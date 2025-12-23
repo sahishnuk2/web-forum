@@ -81,6 +81,15 @@ export const fetchPosts = async (topicId: number) => {
   return await response.json();
 };
 
+export const fetchSinglePost = async (post_id: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to retrieve post");
+  }
+  return await response.json();
+};
+
 export const createPost = async (
   topic_id: number,
   title: string,
@@ -161,6 +170,15 @@ export const fetchComments = async (post_id: number) => {
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Failed to retrieve comments");
+  }
+  return await response.json();
+};
+
+export const fetchSingleComment = async (comment_id: number) => {
+  const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Failed to retrieve comment");
   }
   return await response.json();
 };
