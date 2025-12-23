@@ -22,8 +22,7 @@ function CreateTopicPage() {
     }
 
     try {
-      const data = await createTopic(title, Number(createdBy));
-      console.log(data); // to remove later
+      await createTopic(title, Number(createdBy));
       navigate("/topics");
     } catch (err) {
       if (err instanceof Error) {

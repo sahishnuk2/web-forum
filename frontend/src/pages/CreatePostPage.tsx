@@ -26,8 +26,7 @@ function CreatePostPage() {
     }
 
     try {
-      const data = await createPost(topicId, title, content, createdBy);
-      console.log(data); // to remove later
+      await createPost(topicId, title, content, createdBy);
       navigate(`/topics/${topicId}`);
     } catch (err) {
       if (err instanceof Error) {

@@ -36,8 +36,7 @@ function EditPostPage() {
     const createdBy = user?.id;
 
     try {
-      const data = await editPost(postId, title, content, createdBy);
-      console.log(data); // to remove later
+      await editPost(postId, title, content, createdBy);
       navigate(`/topics/${topicId}`);
     } catch (err) {
       if (err instanceof Error) {

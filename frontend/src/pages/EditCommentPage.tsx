@@ -35,8 +35,7 @@ function EditCommentPage() {
     const createdBy = user?.id;
 
     try {
-      const data = await editComment(commentId, content, createdBy);
-      console.log(data); // to remove later
+      await editComment(commentId, content, createdBy);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
       if (err instanceof Error) {

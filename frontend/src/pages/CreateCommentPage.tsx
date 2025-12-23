@@ -24,8 +24,7 @@ function CreateCommentPage() {
     }
 
     try {
-      const data = await createComment(postId, content, createdBy);
-      console.log(data); // to remove later
+      await createComment(postId, content, createdBy);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
       if (err instanceof Error) {

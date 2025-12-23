@@ -14,8 +14,7 @@ function SignUpPage() {
     e.preventDefault();
     setError("");
     try {
-      const data = await signUp(username, password);
-      console.log(data);
+      await signUp(username, password);
       navigate("/login");
     } catch (err) {
       if (err instanceof Error) {

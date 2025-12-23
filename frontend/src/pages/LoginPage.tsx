@@ -15,7 +15,6 @@ function LoginPage() {
     setError("");
     try {
       const data = await login(username, password);
-      console.log(data); // remove later
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/topics");
     } catch (err) {
