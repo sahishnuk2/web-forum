@@ -27,6 +27,7 @@ function PostsList({ topic_id }: PostsListProp) {
           onDelete={() =>
             setPosts((prev) => prev.filter((p) => p.id !== post.id))
           }
+          disableButtons={false}
         />
       ))}
     </div>
