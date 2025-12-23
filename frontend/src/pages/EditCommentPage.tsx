@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { editComment } from "../services/api";
+import { editComment, fetchSingleComment } from "../services/api";
 import "./CreateTopicPage.css";
 
 function EditCommentPage() {
@@ -12,6 +12,20 @@ function EditCommentPage() {
   const topicId = Number(topic_id);
   const postId = Number(post_id);
   const commentId = Number(comment_id);
+
+  useEffect(() => {
+    async function loadComment() {
+      try {
+        const data = await fetchSingleComment(commentId);
+        setContent(data.content);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        }
+      }
+    }
+    loadComment();
+  }, [commentId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
