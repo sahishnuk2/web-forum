@@ -3,9 +3,11 @@ package handlers
 import (
 	"database/sql"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -84,16 +86,44 @@ func Login(db *sql.DB) gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
             return
 		}
+
+		// Create a new token object, specifying signing method and the claims
+		// you would like it to contain.
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"subject": user.ID,
+			"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+		})
+
+		// Sign and get the complete encoded token as a string using the secret
+		tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Authentication error"})
+            return
+		}
+
+		c.SetSameSite(http.SameSiteLaxMode)
+		c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "", "", false, true)
 		
 		// Success, send user data to frontend
 		c.JSON(http.StatusOK, gin.H {
 			"message": "Login successful",
+			"token": tokenString,
+			// TODO: Remove user later
             "user": gin.H{
                 "id": user.ID,
                 "username": user.Username,
             },
 		})
 	}
+}
+
+func Validate(c *gin.Context) {
+	user, _ := c.Get("user")
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": user,
+	})
 }
 
 func hashPassword(password string) (string, error) {

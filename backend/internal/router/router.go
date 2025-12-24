@@ -3,6 +3,7 @@ package router
 import (
 	"web-forum/internal/database"
 	"web-forum/internal/handlers"
+	"web-forum/internal/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,7 @@ func SetUpRouter() *gin.Engine {
 	// Users
 	router.POST("/api/users/signup", handlers.SignUp(db))
 	router.POST("/api/users/login", handlers.Login(db))
+	router.GET("/api/users/validate", middleware.RequireAuthentication, handlers.Validate)
 
 	// Topics
 	router.GET("/api/topics", handlers.GetTopics(db))
