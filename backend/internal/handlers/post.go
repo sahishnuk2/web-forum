@@ -15,6 +15,8 @@ type Post struct {
 	Content string		`json:"content" binding:"required"`
 	CreatedBy int		`json:"created_by"`
 	CreatedAt time.Time	`json:"created_at"`
+	UpdatedAt time.Time	`json:"updated_at"`
+	Username string 	`json:"username"`
 }
 
 func GetPosts(db *sql.DB) gin.HandlerFunc {
@@ -26,7 +28,21 @@ func GetPosts(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		rows, err := db.Query(`SELECT id, topic_id, title, content, created_by, created_at FROM posts WHERE topic_id = $1`, topicID)
+		query := `
+		SELECT 
+			posts.id, 
+			posts.topic_id, 
+			posts.title, 
+			posts.content, 
+			posts.created_by, 
+			posts.created_at, 
+			posts.updated_at,
+			users.username 
+		FROM posts 
+		INNER JOIN users ON posts.created_by = users.id
+		WHERE posts.topic_id = $1`
+
+		rows, err := db.Query(query, topicID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve posts"})
             return
@@ -36,7 +52,7 @@ func GetPosts(db *sql.DB) gin.HandlerFunc {
 		posts := make([]Post, 0)
 		for rows.Next() {
 			var post Post
-			if err := rows.Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt); err != nil {
+			if err := rows.Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt, &post.UpdatedAt, &post.Username); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while scanning posts"})
 				return
 			}
@@ -56,7 +72,21 @@ func GetPost(db *sql.DB) gin.HandlerFunc {
             return
 		}
 		var post Post
-		err := db.QueryRow(`SELECT id, topic_id, title, content, created_by, created_at FROM posts WHERE id = $1`, postID).Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt)
+		query := `
+		SELECT 
+			posts.id, 
+			posts.topic_id, 
+			posts.title, 
+			posts.content, 
+			posts.created_by, 
+			posts.created_at, 
+			posts.updated_at,
+			users.username 
+		FROM posts 
+		INNER JOIN users ON posts.created_by = users.id
+		WHERE posts.id = $1`
+
+		err := db.QueryRow(query, postID).Scan(&post.ID, &post.TopicID, &post.Title, &post.Content, &post.CreatedBy, &post.CreatedAt, &post.UpdatedAt, &post.Username)
 
 		if err == sql.ErrNoRows {
       		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
@@ -94,9 +124,9 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
 		id := c.Param("id")
 
 		var input struct {
-			Title string	`json:"title" binding:"required"`
-			Content string	`json:"content" binding:"required"`
-			UserID int 		`json:"user_id"`
+			Title string		`json:"title" binding:"required"`
+			Content string		`json:"content" binding:"required"`
+			UserID int 			`json:"user_id"`
 		}
 
 		if err := c.BindJSON(&input); err != nil {
@@ -122,7 +152,7 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		_, err = db.Exec(`UPDATE posts SET title = $1, content = $2 WHERE id = $3`, input.Title, input.Content, id)
+		_, err = db.Exec(`UPDATE posts SET title = $1, content = $2, updated_at = NOW() WHERE id = $3`, input.Title, input.Content, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit post"})
             return

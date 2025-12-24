@@ -76,6 +76,7 @@ func initPostTable() {
 		content     TEXT NOT NULL,
 		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
 		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);`
 
 	execute(createTableQuery)
@@ -88,6 +89,7 @@ func initCommentsTable() {
 		content     TEXT NOT NULL,
 		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
 		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);`
 
 	execute(createTableQuery)

@@ -14,6 +14,7 @@ type Comment struct {
 	Content string		`json:"content" binding:"required"`
 	CreatedBy int		`json:"created_by"`
 	CreatedAt time.Time	`json:"created_at"`
+	UpdatedAt time.Time	`json:"updated_at"`
 }
 
 func GetComments(db *sql.DB) gin.HandlerFunc {
@@ -24,7 +25,7 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		rows, err := db.Query(`SELECT id, post_id, content, created_by, created_at FROM comments WHERE post_id = $1`, postID)
+		rows, err := db.Query(`SELECT id, post_id, content, created_by, created_at, updated_at FROM comments WHERE post_id = $1`, postID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
             return
@@ -34,7 +35,7 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 		comments := make([]Comment, 0)
 		for rows.Next() {
 			var comment Comment
-			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt); err != nil {
+			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while scanning comments"})
 				return
 			}
@@ -54,7 +55,7 @@ func GetComment(db *sql.DB) gin.HandlerFunc {
             return
 		}
 		var comment Comment
-		err := db.QueryRow(`SELECT id, post_id, content, created_by, created_at FROM comments WHERE id = $1`, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt)
+		err := db.QueryRow(`SELECT id, post_id, content, created_by, created_at, updated_at FROM comments WHERE id = $1`, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt)
 		if err == sql.ErrNoRows {
       		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
       		return
@@ -119,7 +120,7 @@ func UpdateComments(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		_, err = db.Exec(`UPDATE comments SET content = $1 WHERE id = $2`, input.Content, id)
+		_, err = db.Exec(`UPDATE comments SET content = $1, updated_at = NOW() WHERE id = $2`, input.Content, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit comment"})
             return
