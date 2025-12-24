@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -26,7 +27,14 @@ func SignUp(db * sql.DB) gin.HandlerFunc {
             return
         }
 
-		_, err := db.Exec(`INSERT INTO users (username, password) VALUES ($1, $2)`, user.Username, user.Password)
+		hashedPassword, err := hashPassword(user.Password)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password"})
+            return
+		}
+
+		_, err = db.Exec(`INSERT INTO users (username, password) VALUES ($1, $2)`, user.Username, hashedPassword)
 
         if err != nil {
             // Check what type of error -> does it violate uniqueness
@@ -72,7 +80,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		}
 
 		// Check if password is correct
-		if user.Password != input.Password {
+		if !comparePasswordAndHash(input.Password, user.Password) {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
             return
 		}
@@ -86,5 +94,15 @@ func Login(db *sql.DB) gin.HandlerFunc {
             },
 		})
 	}
+}
+
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	return string(hash), err;
+}
+
+func comparePasswordAndHash(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
