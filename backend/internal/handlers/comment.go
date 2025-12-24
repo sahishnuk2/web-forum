@@ -36,7 +36,7 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 			comments.updated_at,
 			users.username 
 		FROM comments 
-		INNER JOIN users on comments.created_by = users.id
+		INNER JOIN users ON comments.created_by = users.id
 		WHERE comments.post_id = $1
 		`
 

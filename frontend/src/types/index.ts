@@ -22,6 +22,8 @@ export interface Post {
   content: string;
   created_by: number;
   created_at: string;
+  updated_at: string;
+  username: string;
 }
 
 // Comment
@@ -31,4 +33,6 @@ export interface Comment {
   content: string;
   created_by: number;
   created_at: string;
+  updated_at: string;
+  username: string;
 }

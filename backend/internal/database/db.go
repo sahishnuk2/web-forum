@@ -75,7 +75,7 @@ func initPostTable() {
 		title       VARCHAR(255) NOT NULL,
 		content     TEXT NOT NULL,
 		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);`
 
@@ -88,7 +88,7 @@ func initCommentsTable() {
 		post_id     INT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
 		content     TEXT NOT NULL,
 		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
 	);`
 

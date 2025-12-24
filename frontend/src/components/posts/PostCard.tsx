@@ -18,6 +18,8 @@ function PostCard({
   title,
   content,
   created_by,
+  updated_at,
+  username,
   currentUserId,
   onDelete,
   disableButtons,
@@ -65,6 +67,40 @@ function PostCard({
       }}
     >
       <CardContent>
+        <CardContent
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            margin: 0,
+            padding: 0,
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              textAlign: "left",
+              color: "#006f80",
+              paddingBottom: 1,
+              textDecoration: "underline",
+            }}
+          >
+            {username}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{ textAlign: "left", color: "#006f80", paddingBottom: 1 }}
+          >
+            {new Date(updated_at).toLocaleString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Typography>
+        </CardContent>
+
         <Typography variant="h5" sx={{ textAlign: "left" }}>
           {title}
         </Typography>
