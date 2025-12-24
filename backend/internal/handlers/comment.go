@@ -15,6 +15,7 @@ type Comment struct {
 	CreatedBy int		`json:"created_by"`
 	CreatedAt time.Time	`json:"created_at"`
 	UpdatedAt time.Time	`json:"updated_at"`
+	Username string		`json:"username"`
 }
 
 func GetComments(db *sql.DB) gin.HandlerFunc {
@@ -25,7 +26,21 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		rows, err := db.Query(`SELECT id, post_id, content, created_by, created_at, updated_at FROM comments WHERE post_id = $1`, postID)
+		query := `
+		SELECT 
+			comments.id, 
+			comments.post_id,
+			comments.content, 
+			comments.created_by, 
+			comments.created_at, 
+			comments.updated_at,
+			users.username 
+		FROM comments 
+		INNER JOIN users on comments.created_by = users.id
+		WHERE comments.post_id = $1
+		`
+
+		rows, err := db.Query(query, postID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
             return
@@ -35,7 +50,7 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 		comments := make([]Comment, 0)
 		for rows.Next() {
 			var comment Comment
-			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt); err != nil {
+			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt, &comment.Username); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while scanning comments"})
 				return
 			}
@@ -55,7 +70,22 @@ func GetComment(db *sql.DB) gin.HandlerFunc {
             return
 		}
 		var comment Comment
-		err := db.QueryRow(`SELECT id, post_id, content, created_by, created_at, updated_at FROM comments WHERE id = $1`, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt)
+
+		query := `
+		SELECT 
+			comments.id, 
+			comments.post_id,
+			comments.content, 
+			comments.created_by, 
+			comments.created_at, 
+			comments.updated_at,
+			users.username 
+		FROM comments 
+		INNER JOIN users ON comments.created_by = users.id
+		WHERE comments.id = $1
+		`
+
+		err := db.QueryRow(query, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt, &comment.Username)
 		if err == sql.ErrNoRows {
       		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
       		return
