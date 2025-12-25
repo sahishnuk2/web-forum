@@ -7,6 +7,7 @@ export const login = async (username: string, password: string) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       username,
       password,
@@ -27,6 +28,7 @@ export const signUp = async (username: string, password: string) => {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       username,
       password,
@@ -43,7 +45,9 @@ export const signUp = async (username: string, password: string) => {
 
 // Topics
 export const fetchTopics = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/topics`);
+  const response = await fetch(`${API_BASE_URL}/api/topics`, {
+    credentials: "include",
+  });
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Failed to retrieve topics");
@@ -51,15 +55,15 @@ export const fetchTopics = async () => {
   return await response.json();
 };
 
-export const createTopic = async (title: string, created_by: number) => {
+export const createTopic = async (title: string) => {
   const response = await fetch(`${API_BASE_URL}/api/topics`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       title,
-      created_by,
     }),
   });
 
@@ -73,7 +77,12 @@ export const createTopic = async (title: string, created_by: number) => {
 
 // Posts
 export const fetchPosts = async (topicId: number) => {
-  const response = await fetch(`${API_BASE_URL}/api/posts?topic_id=${topicId}`);
+  const response = await fetch(
+    `${API_BASE_URL}/api/posts?topic_id=${topicId}`,
+    {
+      credentials: "include",
+    }
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Failed to retrieve posts");
@@ -82,7 +91,9 @@ export const fetchPosts = async (topicId: number) => {
 };
 
 export const fetchSinglePost = async (post_id: number) => {
-  const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`);
+  const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
+    credentials: "include",
+  });
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Failed to retrieve post");
@@ -93,19 +104,18 @@ export const fetchSinglePost = async (post_id: number) => {
 export const createPost = async (
   topic_id: number,
   title: string,
-  content: string,
-  created_by: number
+  content: string
 ) => {
   const response = await fetch(`${API_BASE_URL}/api/posts`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       topic_id,
       title,
       content,
-      created_by,
     }),
   });
 
@@ -120,18 +130,17 @@ export const createPost = async (
 export const editPost = async (
   post_id: number,
   title: string,
-  content: string,
-  user_id: number
+  content: string
 ) => {
   const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       title,
       content,
-      user_id,
     }),
   });
 
@@ -143,15 +152,13 @@ export const editPost = async (
   return await response.json();
 };
 
-export const deletePost = async (post_id: number, user_id: number) => {
+export const deletePost = async (post_id: number) => {
   const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      user_id,
-    }),
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -165,7 +172,10 @@ export const deletePost = async (post_id: number, user_id: number) => {
 // Comments
 export const fetchComments = async (post_id: number) => {
   const response = await fetch(
-    `${API_BASE_URL}/api/comments?post_id=${post_id}`
+    `${API_BASE_URL}/api/comments?post_id=${post_id}`,
+    {
+      credentials: "include",
+    }
   );
   if (!response.ok) {
     const errorData = await response.json();
@@ -175,7 +185,9 @@ export const fetchComments = async (post_id: number) => {
 };
 
 export const fetchSingleComment = async (comment_id: number) => {
-  const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`);
+  const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
+    credentials: "include",
+  });
   if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.error || "Failed to retrieve comment");
@@ -183,20 +195,16 @@ export const fetchSingleComment = async (comment_id: number) => {
   return await response.json();
 };
 
-export const createComment = async (
-  post_id: number,
-  content: string,
-  created_by: number
-) => {
+export const createComment = async (post_id: number, content: string) => {
   const response = await fetch(`${API_BASE_URL}/api/comments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       post_id,
       content,
-      created_by,
     }),
   });
 
@@ -207,19 +215,15 @@ export const createComment = async (
   return await response.json();
 };
 
-export const editComment = async (
-  comment_id: number,
-  content: string,
-  user_id: number
-) => {
+export const editComment = async (comment_id: number, content: string) => {
   const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify({
       content,
-      user_id,
     }),
   });
 
@@ -231,15 +235,13 @@ export const editComment = async (
   return await response.json();
 };
 
-export const deleteComment = async (comment_id: number, user_id: number) => {
+export const deleteComment = async (comment_id: number) => {
   const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      user_id,
-    }),
+    credentials: "include",
   });
 
   if (!response.ok) {
