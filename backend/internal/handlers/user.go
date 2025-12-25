@@ -108,8 +108,6 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		// Success, send user data to frontend
 		c.JSON(http.StatusOK, gin.H {
 			"message": "Login successful",
-			"token": tokenString,
-			// TODO: Remove user later
             "user": gin.H{
                 "id": user.ID,
                 "username": user.Username,

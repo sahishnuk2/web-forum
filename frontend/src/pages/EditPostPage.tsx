@@ -31,12 +31,9 @@ function EditPostPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
-    const createdBy = user?.id;
 
     try {
-      await editPost(postId, title, content, createdBy);
+      await editPost(postId, title, content);
       navigate(`/topics/${topicId}`);
     } catch (err) {
       if (err instanceof Error) {

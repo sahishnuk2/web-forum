@@ -37,7 +37,7 @@ function CommentCard({
     }
     setError("");
     try {
-      await deleteComment(id, currentUserId);
+      await deleteComment(id);
       onDelete();
     } catch (err) {
       if (err instanceof Error) {

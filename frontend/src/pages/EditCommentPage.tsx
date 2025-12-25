@@ -30,12 +30,9 @@ function EditCommentPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
-    const createdBy = user?.id;
 
     try {
-      await editComment(commentId, content, createdBy);
+      await editComment(commentId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
       if (err instanceof Error) {
