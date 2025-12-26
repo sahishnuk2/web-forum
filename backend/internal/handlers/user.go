@@ -102,8 +102,14 @@ func Login(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "/", "", false, true)
+		isProduction := os.Getenv("ENVIRONMENT") == "production"
+		if isProduction {
+			c.SetSameSite(http.SameSiteNoneMode)
+			c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "/", "", true, true)	
+		} else {
+			c.SetSameSite(http.SameSiteLaxMode)
+			c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "/", "", false, true)	
+		}
 		
 		// Success, send user data to frontend
 		c.JSON(http.StatusOK, gin.H {
@@ -129,8 +135,14 @@ func Validate(c *gin.Context) {
 }
 
 func LogOut(c *gin.Context) {
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorisation", "", -1, "/", "", false, true)
+	isProduction := os.Getenv("ENVIRONMENT") == "production"
+		if isProduction {
+			c.SetSameSite(http.SameSiteNoneMode)
+			c.SetCookie("Authorisation", "", 3600 * 24 * 30, "/", "", true, true)	
+		} else {
+			c.SetSameSite(http.SameSiteLaxMode)
+			c.SetCookie("Authorisation", "", 3600 * 24 * 30, "/", "", false, true)	
+		}
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Logged out successfully",
