@@ -103,7 +103,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		}
 
 		c.SetSameSite(http.SameSiteLaxMode)
-		c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "", "", false, true)
+		c.SetCookie("Authorisation", tokenString, 3600 * 24 * 30, "/", "", false, true)
 		
 		// Success, send user data to frontend
 		c.JSON(http.StatusOK, gin.H {

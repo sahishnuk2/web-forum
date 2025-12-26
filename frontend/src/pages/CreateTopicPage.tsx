@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createTopic } from "../services/api";
 import "./CreateTopicPage.css";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { handleApiError } from "../components/common/Functions";
 
 function CreateTopicPage() {
   const [title, setTitle] = useState("");
@@ -17,8 +18,9 @@ function CreateTopicPage() {
       await createTopic(title);
       navigate("/topics");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

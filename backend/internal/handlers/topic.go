@@ -47,7 +47,11 @@ func CreateTopic(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		_, err := db.Exec(`INSERT INTO topics (title, created_by) VALUES ($1, $2)`, topic.Title, topic.CreatedBy)
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		_, err := db.Exec(`INSERT INTO topics (title, created_by) VALUES ($1, $2)`, topic.Title, userID)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create topic"})

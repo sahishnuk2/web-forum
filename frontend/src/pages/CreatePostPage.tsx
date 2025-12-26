@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { createPost } from "../services/api";
 import "./CreateTopicPage.css";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { handleApiError } from "../components/common/Functions";
 
 function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -21,8 +22,9 @@ function CreatePostPage() {
       await createPost(topicId, title, content);
       navigate(`/topics/${topicId}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

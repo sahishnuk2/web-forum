@@ -7,7 +7,9 @@ import { useEffect, useState } from "react";
 import type { Post } from "../types";
 import { fetchSinglePost } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
-import getCurrentUserId from "../components/common/Functions";
+import getCurrentUserId, {
+  handleApiError,
+} from "../components/common/Functions";
 
 function CommentsPage() {
   const { post_id, topic_id } = useParams();
@@ -23,8 +25,9 @@ function CommentsPage() {
         const data = await fetchSinglePost(postId);
         setPost(data);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
         }
       }
     }

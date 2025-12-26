@@ -1,4 +1,22 @@
+import { UnauthorisedError } from "../utils/Error";
+
 const API_BASE_URL = import.meta.env["VITE_API_URL"];
+
+async function handleResponse(response: Response, errorMessage: string) {
+  if (!response.ok) {
+    if (response.status == 401) {
+      throw new UnauthorisedError("Session expired. Please log in again");
+    }
+    try {
+      const errorData = await response.json();
+      throw new Error(errorData.error || errorMessage);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  return await response.json();
+}
 
 // Users
 export const login = async (username: string, password: string) => {
@@ -48,11 +66,8 @@ export const fetchTopics = async () => {
   const response = await fetch(`${API_BASE_URL}/api/topics`, {
     credentials: "include",
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve topics");
-  }
-  return await response.json();
+
+  return handleResponse(response, "Failed to retrieve topics");
 };
 
 export const createTopic = async (title: string) => {
@@ -67,12 +82,7 @@ export const createTopic = async (title: string) => {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create topic");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to create topic");
 };
 
 // Posts
@@ -83,22 +93,16 @@ export const fetchPosts = async (topicId: number) => {
       credentials: "include",
     }
   );
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve posts");
-  }
-  return await response.json();
+
+  return handleResponse(response, "Failed to retrieve posts");
 };
 
 export const fetchSinglePost = async (post_id: number) => {
   const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
     credentials: "include",
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve post");
-  }
-  return await response.json();
+
+  return handleResponse(response, "Failed to retrieve post");
 };
 
 export const createPost = async (
@@ -119,12 +123,7 @@ export const createPost = async (
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create post");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to create post");
 };
 
 export const editPost = async (
@@ -144,12 +143,7 @@ export const editPost = async (
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to edit post");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to edit post");
 };
 
 export const deletePost = async (post_id: number) => {
@@ -161,12 +155,7 @@ export const deletePost = async (post_id: number) => {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to delete post");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to delete post");
 };
 
 // Comments
@@ -177,22 +166,16 @@ export const fetchComments = async (post_id: number) => {
       credentials: "include",
     }
   );
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve comments");
-  }
-  return await response.json();
+
+  return handleResponse(response, "Failed to retrieve comments");
 };
 
 export const fetchSingleComment = async (comment_id: number) => {
   const response = await fetch(`${API_BASE_URL}/api/comments/${comment_id}`, {
     credentials: "include",
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to retrieve comment");
-  }
-  return await response.json();
+
+  return handleResponse(response, "Failed to retrieve comment");
 };
 
 export const createComment = async (post_id: number, content: string) => {
@@ -208,11 +191,7 @@ export const createComment = async (post_id: number, content: string) => {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to create comment");
-  }
-  return await response.json();
+  return handleResponse(response, "Failed to create comments");
 };
 
 export const editComment = async (comment_id: number, content: string) => {
@@ -227,12 +206,7 @@ export const editComment = async (comment_id: number, content: string) => {
     }),
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to edit comment");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to edit comment");
 };
 
 export const deleteComment = async (comment_id: number) => {
@@ -244,10 +218,5 @@ export const deleteComment = async (comment_id: number) => {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || "Failed to delete comment");
-  }
-
-  return await response.json();
+  return handleResponse(response, "Failed to delete comment");
 };

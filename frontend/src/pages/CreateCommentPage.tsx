@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { handleApiError } from "../components/common/Functions";
 
 function CreateCommentPage() {
   const [content, setContent] = useState("");
@@ -19,8 +20,9 @@ function CreateCommentPage() {
       await createComment(postId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

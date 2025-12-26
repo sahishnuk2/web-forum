@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { editComment, fetchSingleComment } from "../services/api";
 import "./CreateTopicPage.css";
+import { handleApiError } from "../components/common/Functions";
 
 function EditCommentPage() {
   const [content, setContent] = useState("");
@@ -19,8 +20,9 @@ function EditCommentPage() {
         const data = await fetchSingleComment(commentId);
         setContent(data.content);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
         }
       }
     }
@@ -35,8 +37,9 @@ function EditCommentPage() {
       await editComment(commentId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

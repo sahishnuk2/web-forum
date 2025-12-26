@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { editPost, fetchSinglePost } from "../services/api";
 import "./CreateTopicPage.css";
+import { handleApiError } from "../components/common/Functions";
 
 function EditPostPage() {
   const [title, setTitle] = useState("");
@@ -20,8 +21,9 @@ function EditPostPage() {
         setTitle(data.title);
         setContent(data.content);
       } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
         }
       }
     }
@@ -36,8 +38,9 @@ function EditPostPage() {
       await editPost(postId, title, content);
       navigate(`/topics/${topicId}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

@@ -11,6 +11,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import { handleApiError } from "../common/Functions";
 
 function PostCard({
   id,
@@ -49,8 +50,9 @@ function PostCard({
         onDelete();
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }
