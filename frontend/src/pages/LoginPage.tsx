@@ -3,6 +3,8 @@ import { login, validate } from "../services/api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { TextField, Button } from "@mui/material";
+import "./Authentication.css";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -41,32 +43,43 @@ function LoginPage() {
     <div className="authentication">
       <form onSubmit={handleSubmit}>
         <h1>Login</h1>
-        <div className="input">
-          <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="input">
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className="buttons">
-          {error && <ErrorMessage error={error} />}
-          <button type="submit">LOGIN</button>
-          <p>
-            Don't have an account?
-            <Link to="/signup" className="signup-link">
-              Sign up
-            </Link>
-          </p>
-        </div>
+        {error && <ErrorMessage error={error} />}
+
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="auth-input"
+          autoFocus
+        />
+
+        <TextField
+          label="Password"
+          type="password"
+          variant="outlined"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="auth-input"
+        />
+
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          className="auth-button"
+        >
+          LOGIN
+        </Button>
+
+        <p className="auth-link">
+          Don't have an account?{" "}
+          <Link to="/signup" className="signup-link">
+            Sign up
+          </Link>
+        </p>
       </form>
     </div>
   );

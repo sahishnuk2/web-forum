@@ -3,6 +3,7 @@ import { signUp } from "../services/api";
 import "./Authentication.css";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { Button, TextField } from "@mui/material";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -27,32 +28,43 @@ function SignUpPage() {
     <div className="authentication">
       <form onSubmit={handleSubmit}>
         <h1>Sign Up</h1>
-        <div className="input">
-          <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className="input">
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className="buttons">
-          {error && <ErrorMessage error={error} />}
-          <button type="submit">SIGN UP</button>
-          <p>
-            Already have an account?
-            <Link to="/login" className="login-link">
-              Login
-            </Link>
-          </p>
-        </div>
+        {error && <ErrorMessage error={error} />}
+
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className="auth-input"
+          autoFocus
+        />
+
+        <TextField
+          label="Password"
+          type="password"
+          variant="outlined"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="auth-input"
+        />
+
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          className="auth-button"
+        >
+          SIGN UP
+        </Button>
+
+        <p className="auth-link">
+          Already have an account?
+          <Link to="/login" className="signup-link">
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );
