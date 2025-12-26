@@ -11,6 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import ErrorMessage from "../common/ErrorMessage";
+import { handleApiError } from "../common/Functions";
 
 function CommentCard({
   id,
@@ -37,11 +38,12 @@ function CommentCard({
     }
     setError("");
     try {
-      await deleteComment(id, currentUserId);
+      await deleteComment(id);
       onDelete();
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

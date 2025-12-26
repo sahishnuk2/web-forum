@@ -109,7 +109,11 @@ func CreatePost(db *sql.DB) gin.HandlerFunc {
 			return
 		}
 
-		_, err := db.Exec(`INSERT INTO posts (topic_id, title, content, created_by) VALUES ($1, $2, $3, $4)`, post.TopicID, post.Title, post.Content, post.CreatedBy)
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		_, err := db.Exec(`INSERT INTO posts (topic_id, title, content, created_by) VALUES ($1, $2, $3, $4)`, post.TopicID, post.Title, post.Content, userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create posts"})
 			return
@@ -126,13 +130,16 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
 		var input struct {
 			Title string		`json:"title" binding:"required"`
 			Content string		`json:"content" binding:"required"`
-			UserID int 			`json:"user_id"`
 		}
 
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
 
 		var createdBy int
 		err := db.QueryRow(`SELECT created_by FROM posts WHERE id = $1`, id).Scan(&createdBy)
@@ -147,7 +154,7 @@ func UpdatePost(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		if createdBy != input.UserID {
+		if createdBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only edit posts created by you"})
             return
 		}
@@ -166,14 +173,9 @@ func DeletePost(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		var input struct {
-			UserID int `json:"user_id"`
-		}
-
-		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-			return
-		}
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
 
 		var createdBy int
 		err := db.QueryRow(`SELECT created_by FROM posts WHERE id = $1`, id).Scan(&createdBy)
@@ -188,7 +190,7 @@ func DeletePost(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		if createdBy != input.UserID {
+		if createdBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete posts created by you"})
             return
 		}

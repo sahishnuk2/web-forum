@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createTopic } from "../services/api";
 import "./CreateTopicPage.css";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { handleApiError } from "../components/common/Functions";
 
 function CreateTopicPage() {
   const [title, setTitle] = useState("");
@@ -12,21 +13,14 @@ function CreateTopicPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
-    const createdBy = user?.id;
-
-    if (!createdBy) {
-      navigate("/login");
-      return;
-    }
 
     try {
-      await createTopic(title, Number(createdBy));
+      await createTopic(title);
       navigate("/topics");
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

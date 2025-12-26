@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { handleApiError } from "../components/common/Functions";
 
 function CreateCommentPage() {
   const [content, setContent] = useState("");
@@ -14,21 +15,14 @@ function CreateCommentPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    const userStr = localStorage.getItem("user");
-    const user = userStr ? JSON.parse(userStr) : null;
-    const createdBy = user?.id;
-
-    if (!createdBy) {
-      navigate("/login");
-      return;
-    }
 
     try {
-      await createComment(postId, content, createdBy);
+      await createComment(postId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }

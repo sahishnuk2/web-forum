@@ -39,6 +39,7 @@ func RequireAuthentication(c *gin.Context) {
 		// Check the expiry
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
 			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
 
 		// Find the user with the token subject

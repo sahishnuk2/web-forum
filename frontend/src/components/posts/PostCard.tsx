@@ -11,6 +11,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import { handleApiError } from "../common/Functions";
 
 function PostCard({
   id,
@@ -44,13 +45,14 @@ function PostCard({
     }
     setError("");
     try {
-      await deletePost(id, currentUserId);
+      await deletePost(id);
       if (onDelete) {
         onDelete();
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
+      const errorMessage = handleApiError(err, navigate);
+      if (errorMessage) {
+        setError(errorMessage);
       }
     }
   }
@@ -67,7 +69,7 @@ function PostCard({
       }}
     >
       <CardContent>
-        <CardContent
+        <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -91,15 +93,12 @@ function PostCard({
             variant="body2"
             sx={{ textAlign: "left", color: "#006f80", paddingBottom: 1 }}
           >
-            {new Date(updated_at).toLocaleString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
+            {new Date(updated_at).toLocaleString([], {
+              dateStyle: "medium",
+              timeStyle: "short",
             })}
           </Typography>
-        </CardContent>
+        </Box>
 
         <Typography variant="h5" sx={{ textAlign: "left" }}>
           {title}

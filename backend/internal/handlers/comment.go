@@ -108,7 +108,11 @@ func CreateComment(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		_, err := db.Exec(`INSERT INTO comments (post_id, content, created_by) VALUES ($1, $2, $3)`, comment.PostID, comment.Content, comment.CreatedBy)
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		_, err := db.Exec(`INSERT INTO comments (post_id, content, created_by) VALUES ($1, $2, $3)`, comment.PostID, comment.Content, userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 			return
@@ -123,7 +127,6 @@ func UpdateComments(db *sql.DB) gin.HandlerFunc {
 		id := c.Param("id")
 
 		var input struct {
-			UserID int 		`json:"user_id"`
 			Content string 	`json:"content" binding:"required"`
 		}
 
@@ -131,6 +134,10 @@ func UpdateComments(db *sql.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
 
 		var createdBy int
 		err := db.QueryRow(`SELECT created_by FROM comments WHERE id = $1`, id).Scan(&createdBy)
@@ -145,7 +152,7 @@ func UpdateComments(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		if createdBy != input.UserID {
+		if createdBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only edit comments created by you"})
             return
 		}
@@ -164,14 +171,9 @@ func DeleteComments(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
-		var input struct {
-			UserID int `json:"user_id"`
-		}
-
-		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-			return
-		}
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
 
 		var createdBy int
 		err := db.QueryRow(`SELECT created_by FROM comments WHERE id = $1`, id).Scan(&createdBy)
@@ -186,7 +188,7 @@ func DeleteComments(db *sql.DB) gin.HandlerFunc {
             return
 		}
 
-		if createdBy != input.UserID {
+		if createdBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete comments created by you"})
             return
 		}
