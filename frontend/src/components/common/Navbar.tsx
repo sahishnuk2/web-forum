@@ -6,16 +6,22 @@ import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUsername } from "./Functions";
 import AdbIcon from "@mui/icons-material/Adb";
+import { logOut } from "../../services/api";
 
 export default function Navbar() {
   const navigate = useNavigate();
 
-  function handleLogout() {
+  async function handleLogout() {
     if (!window.confirm("Are you sure you want to logout")) {
       return;
     }
-    localStorage.removeItem("user");
-    navigate("/");
+    try {
+      await logOut();
+      localStorage.removeItem("user");
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
   }
 
   return (

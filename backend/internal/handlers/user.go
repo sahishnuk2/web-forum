@@ -128,6 +128,15 @@ func Validate(c *gin.Context) {
 	})
 }
 
+func LogOut(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorisation", "", -1, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Logged out successfully",
+	})
+}
+
 func hashPassword(password string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), 10)
 	return string(hash), err;

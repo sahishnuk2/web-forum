@@ -61,6 +61,23 @@ export const signUp = async (username: string, password: string) => {
   return await response.json();
 };
 
+export const logOut = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/users/logout`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || "Log Out failed");
+  }
+
+  return await response.json();
+};
+
 // Topics
 export const fetchTopics = async () => {
   const response = await fetch(`${API_BASE_URL}/api/topics`, {
