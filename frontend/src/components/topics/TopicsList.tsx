@@ -1,19 +1,30 @@
+import { useNavigate } from "react-router-dom";
 import { fetchTopics } from "../../services/api";
 import type { Topic } from "../../types";
+import ErrorMessage from "../common/ErrorMessage";
+import { handleApiError } from "../common/Functions";
 import TopicCard from "./TopicCard";
 import { useEffect, useState } from "react";
 
 function TopicsList() {
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTopics()
       .then((data) => setTopics(data))
-      .catch((error) => console.error("Error fetching topics:", error));
+      .catch((err) => {
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
+        }
+      });
   }, []);
 
   return (
     <div>
+      {error && <ErrorMessage error={error} />}
       {topics.map((topic) => (
         <TopicCard
           key={topic.id}

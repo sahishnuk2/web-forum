@@ -57,6 +57,11 @@ func GetComments(db *sql.DB) gin.HandlerFunc {
 			comments = append(comments, comment)
 		}
 
+		if err := rows.Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during retrieval"})
+			return
+		}
+
 		c.JSON(http.StatusOK, comments)
 	}
 }

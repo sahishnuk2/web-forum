@@ -2,7 +2,9 @@ import type { Post } from "../../types";
 import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { fetchPosts } from "../../services/api";
-import getCurrentUserId from "../common/Functions";
+import getCurrentUserId, { handleApiError } from "../common/Functions";
+import { useNavigate } from "react-router-dom";
+import ErrorMessage from "../common/ErrorMessage";
 
 interface PostsListProp {
   topic_id: number;
@@ -10,15 +12,23 @@ interface PostsListProp {
 
 function PostsList({ topic_id }: PostsListProp) {
   const [posts, setPosts] = useState<Post[]>([]);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts(topic_id)
       .then((data) => setPosts(data))
-      .catch((error) => console.error("Error fetching posts: ", error));
-  }, [topic_id]);
+      .catch((err) => {
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
+        }
+      });
+  }, []);
 
   return (
     <div style={{ alignContent: "center" }}>
+      {error && <ErrorMessage error={error} />}
       {posts.map((post) => (
         <PostCard
           key={post.id}

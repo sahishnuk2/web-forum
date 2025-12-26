@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import CommentCard from "./CommentCard";
 import type { Comment } from "../../types";
 import { fetchComments } from "../../services/api";
-import getCurrentUserId from "../common/Functions";
+import getCurrentUserId, { handleApiError } from "../common/Functions";
+import { useNavigate } from "react-router-dom";
+import ErrorMessage from "../common/ErrorMessage";
 
 interface CommentsListProp {
   post_id: number;
@@ -10,15 +12,23 @@ interface CommentsListProp {
 
 function CommentsList({ post_id }: CommentsListProp) {
   const [comments, setComments] = useState<Comment[]>([]);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchComments(post_id)
       .then((data) => setComments(data))
-      .catch((error) => console.error("Error fetching comments: ", error));
+      .catch((err) => {
+        const errorMessage = handleApiError(err, navigate);
+        if (errorMessage) {
+          setError(errorMessage);
+        }
+      });
   }, [post_id]);
 
   return (
     <div>
+      {error && <ErrorMessage error={error} />}
       {comments.map((comment) => (
         <CommentCard
           key={comment.id}

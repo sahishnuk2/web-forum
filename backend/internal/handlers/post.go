@@ -59,6 +59,11 @@ func GetPosts(db *sql.DB) gin.HandlerFunc {
 			posts = append(posts, post)
 		}
 
+		if err := rows.Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during retrieval"})
+			return
+		}
+
 		c.JSON(http.StatusOK, posts)
 	}
 }

@@ -33,6 +33,12 @@ func GetTopics(db *sql.DB) gin.HandlerFunc {
 			}
 			topics = append(topics, topic)
 		}
+		
+		// To check if all data is received
+		if err := rows.Err(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during retrieval"})
+			return
+		}
 
 		c.JSON(http.StatusOK, topics)
 	}
