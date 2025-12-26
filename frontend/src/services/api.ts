@@ -220,3 +220,13 @@ export const deleteComment = async (comment_id: number) => {
 
   return handleResponse(response, "Failed to delete comment");
 };
+
+// Validation
+
+export const validate = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/users/validate`, {
+    credentials: "include",
+  });
+
+  return handleResponse(response, "Not Authenticated");
+};

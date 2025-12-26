@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { login } from "../services/api";
+import { login, validate } from "../services/api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
@@ -25,10 +25,16 @@ function LoginPage() {
   }
 
   useEffect(() => {
-    const userId = localStorage.getItem("user");
-    if (userId) {
-      navigate("/topics");
+    async function runValidation() {
+      try {
+        const data = await validate();
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate("/topics");
+      } catch {
+        // No validation means stay at login page
+      }
     }
+    runValidation();
   }, []);
 
   return (

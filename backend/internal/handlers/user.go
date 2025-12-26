@@ -118,9 +118,13 @@ func Login(db *sql.DB) gin.HandlerFunc {
 
 func Validate(c *gin.Context) {
 	user, _ := c.Get("user")
+	currentUser := user.(User)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": user,
+		"user": gin.H{
+            	"id": currentUser.ID,
+                "username": currentUser.Username,
+		},
 	})
 }
 
