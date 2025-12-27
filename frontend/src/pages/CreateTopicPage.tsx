@@ -27,7 +27,7 @@ function CreateTopicPage() {
   }
 
   return (
-    <div className="create-topic">
+    <div className="create">
       <form onSubmit={handleSubmit}>
         <h1>Create new topic</h1>
         {error && <ErrorMessage error={error} />}

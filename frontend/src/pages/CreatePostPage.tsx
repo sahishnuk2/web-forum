@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createPost } from "../services/api";
-import "./CreateTopicPage.css";
+import "./Pages.css";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { handleApiError } from "../components/common/Functions";
+import { Button, TextField } from "@mui/material";
 
 function CreatePostPage() {
   const [title, setTitle] = useState("");
@@ -30,35 +31,40 @@ function CreatePostPage() {
   }
 
   return (
-    <div className="create-post">
+    <div className="create">
       <form onSubmit={handleSubmit}>
         <h1>Create new post</h1>
-        <div className="input">
-          <label>Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-        </div>
-        <div className="input">
-          <label>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={5}
-          />
-        </div>
+        {error && <ErrorMessage error={error} />}
+
+        <TextField
+          label="Title"
+          variant="outlined"
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="field-input"
+        />
+
+        <TextField
+          id="filled-multiline-flexible"
+          label="Content"
+          multiline
+          minRows={4}
+          maxRows={10}
+          variant="outlined"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="field-input"
+        />
         <div>
-          {error && <ErrorMessage error={error} />}
           <div className="submissions">
-            <button
+            <Button
               type="button"
               onClick={() => navigate(`/topics/${topicId}`)}
             >
               Back
-            </button>
-            <button type="submit">Create</button>
+            </Button>
+            <Button type="submit">Create</Button>
           </div>
         </div>
       </form>

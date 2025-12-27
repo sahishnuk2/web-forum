@@ -1,5 +1,6 @@
 .authentication,
-.create-topic {
+.create,
+.edit {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,7 +14,8 @@
 }
 
 .authentication form,
-.create-topic form {
+.create form,
+.edit form {
   display: flex;
   flex-direction: column;
   gap: 14px;
