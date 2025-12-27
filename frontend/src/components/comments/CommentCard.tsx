@@ -56,7 +56,13 @@ function CommentCard({
         margin: "16px auto",
         backgroundColor: "inherit",
         color: "inherit",
-        boxShadow: 6,
+        boxShadow: 4,
+        borderRadius: 2,
+        border: "1px solid transparent",
+        transition: "border-color 0.2s ease",
+        "&:hover": {
+          borderColor: "#006f80",
+        },
       }}
     >
       <CardContent
@@ -81,12 +87,9 @@ function CommentCard({
           variant="body2"
           sx={{ textAlign: "left", color: "#006f80", paddingBottom: 1 }}
         >
-          {new Date(updated_at).toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
+          {new Date(updated_at).toLocaleString([], {
+            dateStyle: "medium",
+            timeStyle: "short",
           })}
         </Typography>
       </CardContent>

@@ -65,7 +65,13 @@ function PostCard({
         margin: "16px auto",
         backgroundColor: "inherit",
         color: "inherit",
-        boxShadow: 6,
+        boxShadow: 4,
+        border: "1px solid transparent",
+        transition: "border-color 0.2s ease",
+        "&:hover": {
+          borderColor: "#006f80",
+        },
+        borderRadius: 2,
       }}
     >
       <CardContent>

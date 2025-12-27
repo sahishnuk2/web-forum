@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import type { Topic } from "../../types";
-import "./TopicCard.css";
 import {
   Card,
   CardActions,
@@ -21,8 +20,14 @@ function TopicCard({ id, title }: Topic) {
         backgroundColor: "inherit",
         color: "inherit",
         boxShadow: 6,
+        borderRadius: 2,
         display: "flex",
         justifyContent: "space-between",
+        border: "1px solid transparent",
+        transition: "border-color 0.2s ease",
+        "&:hover": {
+          borderColor: "#006f80",
+        },
       }}
     >
       <CardContent>
