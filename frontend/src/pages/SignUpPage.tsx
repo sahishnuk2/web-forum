@@ -24,7 +24,14 @@ function SignUpPage() {
   }
 
   function notFulfillPasswordRequirement(): boolean {
-    return password.length > 0 && password.length < 8;
+    if (password.length > 0) {
+      const hasMinLength = password.length >= 8;
+      const hasUppercase = /[A-Z]/.test(password);
+      const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+      return !(hasMinLength && hasUppercase && hasSpecialChar);
+    } else {
+      return false; // None -> will be blocked by the button
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -72,7 +79,7 @@ function SignUpPage() {
           onChange={(e) => setPassword(e.target.value)}
           helperText={
             notFulfillPasswordRequirement()
-              ? "Password must be at least 8 characters"
+              ? "Password must be at least 8 characters, include 1 uppercase & 1 special character"
               : ""
           }
           className="auth-input"
