@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { editComment, fetchSingleComment } from "../services/api";
-import "./CreateTopicPage.css";
+import "./Pages.css";
 import { handleApiError } from "../components/common/Functions";
+import ErrorMessage from "../components/common/ErrorMessage";
+import { Button, TextField } from "@mui/material";
 
 function EditCommentPage() {
   const [content, setContent] = useState("");
@@ -45,28 +47,34 @@ function EditCommentPage() {
   }
 
   return (
-    <div className="edit-comment">
+    <div className="edit">
       <form onSubmit={handleSubmit}>
         <h1>Edit comment</h1>
-        <div className="input">
-          <label>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={5}
-          />
-        </div>
-        <div>
-          {error && <p style={{ color: "red" }}>{error}</p>}
-          <div className="submissions">
-            <button
-              type="button"
-              onClick={() => navigate(`/topics/${topicId}/${postId}`)}
-            >
-              Back
-            </button>
-            <button type="submit">Edit</button>
-          </div>
+        {error && <ErrorMessage error={error} />}
+
+        <TextField
+          id="filled-multiline-flexible"
+          label="Content"
+          multiline
+          minRows={4}
+          maxRows={10}
+          variant="outlined"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="field-input"
+        />
+
+        <div className="submissions">
+          <Button
+            type="button"
+            onClick={() => navigate(`/topics/${topicId}/${postId}`)}
+            className="field-button"
+          >
+            Back
+          </Button>
+          <Button type="submit" className="field-button">
+            Save
+          </Button>
         </div>
       </form>
     </div>
