@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { signUp } from "../services/api";
-import "./Authentication.css";
+import "./Pages.css";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { Button, TextField } from "@mui/material";

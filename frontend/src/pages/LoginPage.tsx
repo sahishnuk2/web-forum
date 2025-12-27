@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { TextField, Button } from "@mui/material";
-import "./Authentication.css";
+import "./Pages.css";
 
 function LoginPage() {
   const [username, setUsername] = useState("");

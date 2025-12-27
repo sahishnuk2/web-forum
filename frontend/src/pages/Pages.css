@@ -1,16 +1,19 @@
-.authentication {
+.authentication,
+.create-topic {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-width: 100%;
 }
 
 .authentication h1 {
   margin-bottom: 20px;
 }
 
-.authentication form {
+.authentication form,
+.create-topic form {
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -41,34 +44,41 @@
 }
 
 /* MUI TextField Styling */
-.auth-input {
+.auth-input,
+.field-input {
   margin-bottom: 16px !important;
 }
 
-.auth-input .MuiOutlinedInput-root {
+.auth-input .MuiOutlinedInput-root,
+.field-input .MuiOutlinedInput-root {
   color: whitesmoke;
 }
 
-.auth-input .MuiOutlinedInput-notchedOutline {
+.auth-input .MuiOutlinedInput-notchedOutline,
+.field-input .MuiOutlinedInput-notchedOutline {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-.auth-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+.auth-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline,
+.field-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
   border-color: rgba(255, 255, 255, 0.5);
 }
 
-.auth-input
+.auth-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline,
+.field-input
   .MuiOutlinedInput-root.Mui-focused
   .MuiOutlinedInput-notchedOutline {
   border-color: #006f80;
   border-width: 2px;
 }
 
-.auth-input .MuiInputLabel-root {
+.auth-input .MuiInputLabel-root,
+.field-input .MuiInputLabel-root {
   color: whitesmoke;
 }
 
-.auth-input .MuiInputLabel-root.Mui-focused {
+.auth-input .MuiInputLabel-root.Mui-focused,
+.field-input .MuiInputLabel-root.Mui-focused {
   color: #006f80;
 }
 
