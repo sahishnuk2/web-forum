@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { handleApiError } from "../components/common/Functions";
+import { Button, TextField } from "@mui/material";
 
 function CreateCommentPage() {
   const [content, setContent] = useState("");
@@ -28,28 +29,29 @@ function CreateCommentPage() {
   }
 
   return (
-    <div className="create-comment">
+    <div className="create">
       <form onSubmit={handleSubmit}>
         <h1>Create new comment</h1>
-        <div className="input">
-          <label>Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={5}
-          />
-        </div>
-        <div>
-          {error && <ErrorMessage error={error} />}
-          <div className="submissions">
-            <button
-              type="button"
-              onClick={() => navigate(`/topics/${topicId}/${postId}`)}
-            >
-              Back
-            </button>
-            <button type="submit">Create</button>
-          </div>
+        {error && <ErrorMessage error={error} />}
+        <TextField
+          id="filled-multiline-flexible"
+          label="Content"
+          multiline
+          minRows={4}
+          maxRows={10}
+          variant="outlined"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="field-input"
+        />
+        <div className="submissions">
+          <Button
+            type="button"
+            onClick={() => navigate(`/topics/${topicId}/${postId}`)}
+          >
+            Back
+          </Button>
+          <Button type="submit">Create</Button>
         </div>
       </form>
     </div>

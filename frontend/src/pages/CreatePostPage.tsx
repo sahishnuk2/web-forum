@@ -56,16 +56,12 @@ function CreatePostPage() {
           onChange={(e) => setContent(e.target.value)}
           className="field-input"
         />
-        <div>
-          <div className="submissions">
-            <Button
-              type="button"
-              onClick={() => navigate(`/topics/${topicId}`)}
-            >
-              Back
-            </Button>
-            <Button type="submit">Create</Button>
-          </div>
+
+        <div className="submissions">
+          <Button type="button" onClick={() => navigate(`/topics/${topicId}`)}>
+            Back
+          </Button>
+          <Button type="submit">Create</Button>
         </div>
       </form>
     </div>
