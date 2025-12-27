@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { editPost, fetchSinglePost } from "../services/api";
 import "./Pages.css";
-import { handleApiError } from "../components/common/Functions";
+import { emptyFields, handleApiError } from "../components/common/Functions";
 import { Button, TextField } from "@mui/material";
 import ErrorMessage from "../components/common/ErrorMessage";
 
@@ -78,7 +78,9 @@ function EditPostPage() {
           <Button type="button" onClick={() => navigate(`/topics/${topicId}`)}>
             Back
           </Button>
-          <Button type="submit">Save</Button>
+          <Button type="submit" disabled={emptyFields(title, content)}>
+            Save
+          </Button>
         </div>
       </form>
     </div>

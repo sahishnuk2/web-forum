@@ -7,12 +7,15 @@ async function handleResponse(response: Response, errorMessage: string) {
     if (response.status == 401) {
       throw new UnauthorisedError("Session expired. Please log in again");
     }
+    let backendError = errorMessage;
     try {
       const errorData = await response.json();
-      throw new Error(errorData.error || errorMessage);
+      backendError = errorData.error || errorMessage;
     } catch {
-      throw new Error(errorMessage);
+      // JSON parsing failed, use generic message
     }
+
+    throw new Error(backendError);
   }
 
   return await response.json();

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { editComment, fetchSingleComment } from "../services/api";
 import "./Pages.css";
-import { handleApiError } from "../components/common/Functions";
+import { emptyFields, handleApiError } from "../components/common/Functions";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { Button, TextField } from "@mui/material";
 
@@ -72,7 +72,11 @@ function EditCommentPage() {
           >
             Back
           </Button>
-          <Button type="submit" className="field-button">
+          <Button
+            type="submit"
+            disabled={emptyFields(content)}
+            className="field-button"
+          >
             Save
           </Button>
         </div>

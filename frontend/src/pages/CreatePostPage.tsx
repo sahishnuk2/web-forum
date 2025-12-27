@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { createPost } from "../services/api";
 import "./Pages.css";
 import ErrorMessage from "../components/common/ErrorMessage";
-import { handleApiError } from "../components/common/Functions";
+import { emptyFields, handleApiError } from "../components/common/Functions";
 import { Button, TextField } from "@mui/material";
 
 function CreatePostPage() {
@@ -61,7 +61,9 @@ function CreatePostPage() {
           <Button type="button" onClick={() => navigate(`/topics/${topicId}`)}>
             Back
           </Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={emptyFields(title, content)}>
+            Create
+          </Button>
         </div>
       </form>
     </div>

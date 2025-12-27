@@ -63,7 +63,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		
 		// Validate input
 		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid credentials"})
             return
 		}
 
@@ -72,7 +72,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 
 		// Check if username is there
 		if err == sql.ErrNoRows {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid username"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
             return
 		}
 
@@ -83,7 +83,7 @@ func Login(db *sql.DB) gin.HandlerFunc {
 
 		// Check if password is correct
 		if !comparePasswordAndHash(input.Password, user.Password) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
             return
 		}
 

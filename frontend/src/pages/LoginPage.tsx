@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { TextField, Button } from "@mui/material";
 import "./Pages.css";
+import { emptyFields } from "../components/common/Functions";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
@@ -70,6 +71,7 @@ function LoginPage() {
           variant="contained"
           fullWidth
           className="auth-button"
+          disabled={emptyFields(username, password)}
         >
           LOGIN
         </Button>

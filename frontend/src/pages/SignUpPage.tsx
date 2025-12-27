@@ -4,6 +4,7 @@ import "./Pages.css";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { Button, TextField } from "@mui/material";
+import { emptyFields } from "../components/common/Functions";
 
 function SignUpPage() {
   const [username, setUsername] = useState("");
@@ -12,11 +13,17 @@ function SignUpPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  function notFulfillUsername(): boolean {
+    return (
+      username.length > 0 && !(username.length >= 3 && username.length <= 50)
+    );
+  }
+
   function passwordsNotMatch(): boolean {
     return verifiedPassword.length > 0 && password !== verifiedPassword;
   }
 
-  function checkPasswordRequirement(): boolean {
+  function notFulfillPasswordRequirement(): boolean {
     return password.length > 0 && password.length < 8;
   }
 
@@ -44,7 +51,13 @@ function SignUpPage() {
           variant="outlined"
           fullWidth
           value={username}
+          error={notFulfillUsername()}
           onChange={(e) => setUsername(e.target.value)}
+          helperText={
+            notFulfillUsername()
+              ? "Username length must be between 3 to 50 "
+              : ""
+          }
           className="auth-input"
           autoFocus
         />
@@ -55,10 +68,10 @@ function SignUpPage() {
           variant="outlined"
           fullWidth
           value={password}
-          error={checkPasswordRequirement()}
+          error={notFulfillPasswordRequirement()}
           onChange={(e) => setPassword(e.target.value)}
           helperText={
-            checkPasswordRequirement()
+            notFulfillPasswordRequirement()
               ? "Password must be at least 8 characters"
               : ""
           }
@@ -82,7 +95,12 @@ function SignUpPage() {
           variant="contained"
           fullWidth
           className="auth-button"
-          disabled={checkPasswordRequirement() || passwordsNotMatch()}
+          disabled={
+            emptyFields(username, password, verifiedPassword) ||
+            notFulfillUsername() ||
+            notFulfillPasswordRequirement() ||
+            passwordsNotMatch()
+          }
         >
           SIGN UP
         </Button>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
-import { handleApiError } from "../components/common/Functions";
+import { emptyFields, handleApiError } from "../components/common/Functions";
 import { Button, TextField } from "@mui/material";
 
 function CreateCommentPage() {
@@ -52,7 +52,9 @@ function CreateCommentPage() {
           >
             Back
           </Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit" disabled={emptyFields(content)}>
+            Create
+          </Button>
         </div>
       </form>
     </div>

@@ -34,3 +34,12 @@ export function handleApiError(
     return "Unknown error occurred";
   }
 }
+
+export function emptyFields(...fields: string[]) {
+  for (const field of fields) {
+    if (field.length === 0) {
+      return true;
+    }
+  }
+  return false;
+}

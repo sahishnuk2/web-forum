@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 )
 
 type Topic struct {
@@ -49,7 +50,7 @@ func CreateTopic(db *sql.DB) gin.HandlerFunc {
 		var topic Topic
 
 		if err := c.BindJSON(&topic); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input."})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
             return
 		}
 
@@ -60,9 +61,19 @@ func CreateTopic(db *sql.DB) gin.HandlerFunc {
 		_, err := db.Exec(`INSERT INTO topics (title, created_by) VALUES ($1, $2)`, topic.Title, userID)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create topic"})
+            // Check what type of error -> does it violate uniqueness
+            if pqErr, ok := err.(*pq.Error); ok {
+                // 23505 = unique_violation error code
+                if pqErr.Code == "23505" {
+                    c.JSON(http.StatusConflict, gin.H{"error": "Topic already exists"})
+                    return
+                }
+            }
+            
+			// Other database errors
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create topic"})
             return
-		}
+        }
 
 		c.JSON(http.StatusCreated, gin.H{"message": "Topic created successfully"})
 	}
