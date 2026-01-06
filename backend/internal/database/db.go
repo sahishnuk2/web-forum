@@ -38,7 +38,7 @@ func connect() {
 
     // Try to connect with retries
     maxRetries := 5
-    for i := 0; i < maxRetries; i++ {
+    for i := range maxRetries {
         db, err = sql.Open("postgres", connStr)
         if err != nil {
             log.Printf("Attempt %d: Failed to open database: %v", i+1, err)
@@ -46,7 +46,7 @@ func connect() {
             continue
         }
 
-          // Ping with timeout
+        // Ping with timeout
         ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
         err = db.PingContext(ctx)
         cancel()
