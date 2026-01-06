@@ -1,9 +1,11 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
@@ -24,26 +26,41 @@ func GetDB() *sql.DB {
 }
 
 func connect() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No .env file found, using environment variables instead")
-	}
+    err := godotenv.Load()
+    if err != nil {
+        log.Println("No .env file found, using environment variables instead")
+    }
 
-	// Get the connection string
-	connStr := os.Getenv("DATABASE_URL")
-	if connStr == "" {
-		log.Fatal("DATABASE_URL is not set in .env or environment")
-	}
+    connStr := os.Getenv("DATABASE_URL")
+    if connStr == "" {
+        log.Fatal("DATABASE_URL is not set in .env or environment")
+    }
 
-	db, err = sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal("Failed to open database: ", err)
-	}
+    // Try to connect with retries
+    maxRetries := 5
+    for i := 0; i < maxRetries; i++ {
+        db, err = sql.Open("postgres", connStr)
+        if err != nil {
+            log.Printf("Attempt %d: Failed to open database: %v", i+1, err)
+            time.Sleep(2 * time.Second)
+            continue
+        }
 
-	// Check connection once
-	if err := db.Ping(); err != nil {
-		log.Fatal("Could not connect to database:", err)
-	}
+          // Ping with timeout
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        err = db.PingContext(ctx)
+        cancel()
+
+        if err == nil {
+            log.Println("Successfully connected to database")
+            return // Success!
+        }
+
+        log.Printf("Attempt %d: Could not ping database: %v", i+1, err)
+        time.Sleep(2 * time.Second)
+    }
+
+    log.Fatal("Failed to connect to database after retries")
 }
 
 func initUserTable() {
