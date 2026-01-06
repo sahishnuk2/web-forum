@@ -15,10 +15,14 @@ var db *sql.DB
 
 func InitDB() {
 	connect()
-	initUserTable()
-	initTopicTable()
-	initPostTable()
-	initCommentsTable()
+	if os.Getenv("ENVIRONMENT") == "development" {
+		// Session pooler has problems with creating already present tables
+		initUserTable()
+		initTopicTable()
+		initPostTable()
+		initCommentsTable()
+	}
+	
 }
 
 func GetDB() *sql.DB {
