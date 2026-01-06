@@ -53,6 +53,10 @@ func connect() {
 
         if err == nil {
             log.Println("Successfully connected to database")
+			db.SetMaxOpenConns(25)                 // Max open connections
+			db.SetMaxIdleConns(5)                  // Max idle connections
+			db.SetConnMaxLifetime(5 * time.Minute) // Refresh connections every 5 min
+			db.SetConnMaxIdleTime(1 * time.Minute) // Close idle connections after 1 min
             return // Success!
         }
 
