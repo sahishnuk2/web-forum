@@ -1,14 +1,14 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/lib/pq"
+	"github.com/supabase-community/supabase-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,7 +19,7 @@ type User struct {
 	CreatedAt time.Time	`json:"created_at"`
 }
 
-func SignUp(db * sql.DB) gin.HandlerFunc {
+func SignUp(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user User
 		
@@ -36,17 +36,18 @@ func SignUp(db * sql.DB) gin.HandlerFunc {
             return
 		}
 
-		_, err = db.Exec(`INSERT INTO users (username, password) VALUES ($1, $2)`, user.Username, hashedPassword)
+		data := map[string]interface{} {
+			"username": user.Username,
+			"password": hashedPassword,
+		}
+
+		_, _, err = client.From("users").Insert(data, false, "", "", "").Execute()
 
         if err != nil {
-            // Check what type of error -> does it violate uniqueness
-            if pqErr, ok := err.(*pq.Error); ok {
-                // 23505 = unique_violation error code
-                if pqErr.Code == "23505" {
-                    c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
-                    return
-                }
-            }
+            if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "unique") {
+				c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+                return
+			}
             
 			// Other database errors
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -57,7 +58,7 @@ func SignUp(db * sql.DB) gin.HandlerFunc {
 	}
 }
 
-func Login(db *sql.DB) gin.HandlerFunc {
+func Login(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var input User
 		
@@ -68,18 +69,17 @@ func Login(db *sql.DB) gin.HandlerFunc {
 		}
 
 		var user User
-		err := db.QueryRow(`SELECT id, username, password, created_at FROM users WHERE username = $1`, input.Username).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
-
-		// Check if username is there
-		if err == sql.ErrNoRows {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-            return
-		}
+		_, err := client.From("users").Select("id, username, password, created_at", "", false).Eq("username", input.Username).Single().ExecuteTo(&user)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+            if strings.Contains(err.Error(), "PGRST116") || strings.Contains(err.Error(), "0 rows") {
+                c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+                return
+            }
+
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
             return
-		}
+        }
 
 		// Check if password is correct
 		if !comparePasswordAndHash(input.Password, user.Password) {
