@@ -1,124 +1,36 @@
 package database
 
 import (
-	"context"
-	"database/sql"
+	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+	"github.com/supabase-community/supabase-go"
 )
 
-var db *sql.DB
+var client *supabase.Client
 
 func InitDB() {
-	connect()
-	initUserTable()
-	initTopicTable()
-	initPostTable()
-	initCommentsTable()
-}
-
-func GetDB() *sql.DB {
-	return db
-}
-
-func connect() {
-    err := godotenv.Load()
-    if err != nil {
+	err := godotenv.Load()
+	if err != nil {
         log.Println("No .env file found, using environment variables instead")
     }
 
-    connStr := os.Getenv("DATABASE_URL")
-    if connStr == "" {
-        log.Fatal("DATABASE_URL is not set in .env or environment")
+	supabaseURL := os.Getenv("SUPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_KEY")
+	if supabaseURL == "" || supabaseKey == "" {
+        log.Fatal("SUPABASE_URL or SUPABASE_URL must be set in .env or environment")
     }
 
-    // Try to connect with retries
-    maxRetries := 5
-    for i := range maxRetries {
-        db, err = sql.Open("postgres", connStr)
-        if err != nil {
-            log.Printf("Attempt %d: Failed to open database: %v", i+1, err)
-            time.Sleep(2 * time.Second)
-            continue
-        }
-
-        // Ping with timeout
-        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-        err = db.PingContext(ctx)
-        cancel()
-
-        if err == nil {
-            log.Println("Successfully connected to database")
-			db.SetMaxOpenConns(25)                 // Max open connections
-			db.SetMaxIdleConns(5)                  // Max idle connections
-			db.SetConnMaxLifetime(5 * time.Minute) // Refresh connections every 5 min
-			db.SetConnMaxIdleTime(1 * time.Minute) // Close idle connections after 1 min
-            return // Success!
-        }
-
-        log.Printf("Attempt %d: Could not ping database: %v", i+1, err)
-        time.Sleep(2 * time.Second)
-    }
-
-    log.Fatal("Failed to connect to database after retries")
-}
-
-func initUserTable() {
-	createTableQuery := `CREATE TABLE IF NOT EXISTS users (
-		id          SERIAL PRIMARY KEY,
-		username    VARCHAR(50) UNIQUE NOT NULL,
-		password    TEXT NOT NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);`
-
-	execute(createTableQuery)
-}
-
-func initTopicTable() {
-	createTableQuery := `CREATE TABLE IF NOT EXISTS topics (
-		id          SERIAL PRIMARY KEY,
-		title       VARCHAR(255) UNIQUE NOT NULL,
-		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);`
-
-	execute(createTableQuery)
-}
-
-func initPostTable() {
-	createTableQuery := `CREATE TABLE IF NOT EXISTS posts (
-		id          SERIAL PRIMARY KEY,
-		topic_id    INT NOT NULL REFERENCES topics(id) ON DELETE CASCADE,
-		title       VARCHAR(255) NOT NULL,
-		content     TEXT NOT NULL,
-		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);`
-
-	execute(createTableQuery)
-}
-
-func initCommentsTable() {
-	createTableQuery := `CREATE TABLE IF NOT EXISTS comments (
-		id          SERIAL PRIMARY KEY,
-		post_id     INT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-		content     TEXT NOT NULL,
-		created_by  INT REFERENCES users(id) ON DELETE SET NULL,
-		created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-		updated_at	TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);`
-
-	execute(createTableQuery)
-}
-
-func execute(query string) {
-	_, err := db.Exec(query)
+	client, err = supabase.NewClient(supabaseURL, supabaseKey, &supabase.ClientOptions{})
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Failed to initalize the client: ", err)
 	}
+
+	log.Println("Successfully initialized Supabase client")
+}
+
+func GetClient() *supabase.Client {
+	return client
 }

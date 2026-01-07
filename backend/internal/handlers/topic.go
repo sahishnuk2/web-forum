@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
+	"github.com/supabase-community/supabase-go"
 )
 
 type Topic struct {
@@ -16,36 +16,20 @@ type Topic struct {
 	CreatedAt time.Time	`json:"created_at"`
 }
 
-func GetTopics(db *sql.DB) gin.HandlerFunc {
+func GetTopics(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rows, err := db.Query("SELECT id, title, created_by, created_at FROM topics")
+		var topics []Topic
+		_, err := client.From("topics").Select("id, title, created_by, created_at", "", false).ExecuteTo(&topics)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve topics"})
             return
-		}
-		defer rows.Close()
-
-		topics := make([]Topic, 0)
-		for rows.Next() {
-			var topic Topic
-			if err := rows.Scan(&topic.ID, &topic.Title, &topic.CreatedBy, &topic.CreatedAt); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while scanning topics"})
-				return
-			}
-			topics = append(topics, topic)
-		}
-		
-		// To check if all data is received
-		if err := rows.Err(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during retrieval"})
-			return
 		}
 
 		c.JSON(http.StatusOK, topics)
 	}
 }
 
-func CreateTopic(db *sql.DB) gin.HandlerFunc {
+func CreateTopic(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var topic Topic
 
@@ -58,17 +42,17 @@ func CreateTopic(db *sql.DB) gin.HandlerFunc {
 		currentUser := user.(User)
 		userID := currentUser.ID
 
-		_, err := db.Exec(`INSERT INTO topics (title, created_by) VALUES ($1, $2)`, topic.Title, userID)
+		data := map[string]interface{} {
+			"title": topic.Title,
+			"created_by": userID,
+		}
 
+		_, _, err := client.From("topics").Insert(data, false, "", "", "").Execute()
 		if err != nil {
-            // Check what type of error -> does it violate uniqueness
-            if pqErr, ok := err.(*pq.Error); ok {
-                // 23505 = unique_violation error code
-                if pqErr.Code == "23505" {
-                    c.JSON(http.StatusConflict, gin.H{"error": "Topic already exists"})
-                    return
-                }
-            }
+            if strings.Contains(err.Error(), "duplicate") || strings.Contains(err.Error(), "unique") {
+				c.JSON(http.StatusConflict, gin.H{"error": "Topic already exists"})
+                return
+			}
             
 			// Other database errors
             c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create topic"})
