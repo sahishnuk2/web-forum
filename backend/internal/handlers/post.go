@@ -70,6 +70,7 @@ func GetPost(client *supabase.Client) gin.HandlerFunc {
 func CreatePost(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var post Post
+
 		if err := c.BindJSON(&post); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input"})
 			return

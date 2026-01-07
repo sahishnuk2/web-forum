@@ -28,15 +28,14 @@ func SetUpRouter() *gin.Engine {
 
 	// Define routes
 	router.GET("/", func(c *gin.Context) {
-    	c.JSON(200, gin.H{"message": "Welcome to Web Forum API"})
-  	})
+		c.JSON(200, gin.H{"message": "Welcome to Web Forum API"})
+	})
 
 	// For Render
 	router.GET("/healthz", func(c *gin.Context) {
-  		c.JSON(200, gin.H{"status": "ok"})
+		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	
 	// Users
 	router.POST("/api/users/signup", handlers.SignUp(client))
 	router.POST("/api/users/login", handlers.Login(client))
@@ -58,8 +57,8 @@ func SetUpRouter() *gin.Engine {
 	router.GET("/api/comments", middleware.RequireAuthentication, handlers.GetComments(client))
 	router.GET("/api/comments/:id", middleware.RequireAuthentication, handlers.GetComment(client))
 	router.POST("/api/comments", middleware.RequireAuthentication, handlers.CreateComment(client))
-	router.PUT("/api/comments/:id", middleware.RequireAuthentication, handlers.UpdateComments(client))
-	router.DELETE("/api/comments/:id", middleware.RequireAuthentication, handlers.DeleteComments(client))
+	router.PUT("/api/comments/:id", middleware.RequireAuthentication, handlers.UpdateComment(client))
+	router.DELETE("/api/comments/:id", middleware.RequireAuthentication, handlers.DeleteComment(client))
 
 	return router
 }
