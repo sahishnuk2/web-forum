@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -10,16 +11,27 @@ import (
 )
 
 type Post struct {
-	ID        int       `json:"id"`
-	TopicID   int       `json:"topic_id"`
-	Title     string    `json:"title" binding:"required"`
-	Content   string    `json:"content" binding:"required"`
-	CreatedBy int       `json:"created_by"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int    `json:"id"`
+	TopicID   int    `json:"topic_id"`
+	Title     string `json:"title" binding:"required"`
+	Content   string `json:"content" binding:"required"`
+	CreatedBy int    `json:"created_by"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 	Users     struct {
 		Username string `json:"username"`
 	} `json:"users"`
+}
+
+type FlatPost struct {
+	ID        int    `json:"id"`
+	TopicID   int    `json:"topic_id"`
+	Title     string `json:"title" binding:"required"`
+	Content   string `json:"content" binding:"required"`
+	CreatedBy int    `json:"created_by"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Username  string `json:"username"`
 }
 
 func GetPosts(client *supabase.Client) gin.HandlerFunc {
@@ -34,11 +46,26 @@ func GetPosts(client *supabase.Client) gin.HandlerFunc {
 
 		_, err := client.From("posts").Select(`id, topic_id, title, content, created_by, created_at, updated_at, users(username)`, "", false).Eq("topic_id", topicID).ExecuteTo(&posts)
 		if err != nil {
+			log.Printf("Error fetching posts: %v", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve posts"})
 			return
 		}
 
-		c.JSON(http.StatusOK, posts)
+		flatPosts := make([]FlatPost, len(posts))
+		for i, post := range posts {
+			flatPosts[i] = FlatPost{
+				ID:        post.ID,
+				TopicID:   post.TopicID,
+				Title:     post.Title,
+				Content:   post.Content,
+				CreatedBy: post.CreatedBy,
+				CreatedAt: post.CreatedAt,
+				UpdatedAt: post.UpdatedAt,
+				Username:  post.Users.Username,
+			}
+		}
+
+		c.JSON(http.StatusOK, flatPosts)
 	}
 }
 
@@ -63,7 +90,18 @@ func GetPost(client *supabase.Client) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, post)
+		flatPost := FlatPost{
+			ID:        post.ID,
+			TopicID:   post.TopicID,
+			Title:     post.Title,
+			Content:   post.Content,
+			CreatedBy: post.CreatedBy,
+			CreatedAt: post.CreatedAt,
+			UpdatedAt: post.UpdatedAt,
+			Username:  post.Users.Username,
+		}
+
+		c.JSON(http.StatusOK, flatPost)
 	}
 }
 

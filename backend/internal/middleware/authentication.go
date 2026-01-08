@@ -53,7 +53,11 @@ func RequireAuthentication(c *gin.Context) {
 
 		// Find the user with the token subject
 		var user handlers.User
-		database.GetClient().From("users").Select("id, username, password, created_at", "", false).Eq("id", strconv.Itoa(userID)).Single().ExecuteTo(&user)
+		_, err := database.GetClient().From("users").Select("id, username, password, created_at", "", false).Eq("id", strconv.Itoa(userID)).Single().ExecuteTo(&user)
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		if user.ID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)
