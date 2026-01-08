@@ -4,11 +4,12 @@ import { editComment, fetchSingleComment } from "../services/api";
 import "./Pages.css";
 import { emptyFields, handleApiError } from "../components/common/Functions";
 import ErrorMessage from "../components/common/ErrorMessage";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 
 function EditCommentPage() {
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const { topic_id, comment_id, post_id } = useParams();
@@ -36,6 +37,7 @@ function EditCommentPage() {
     setError("");
 
     try {
+      setLoading(true);
       await editComment(commentId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
@@ -43,6 +45,8 @@ function EditCommentPage() {
       if (errorMessage) {
         setError(errorMessage);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -74,10 +78,10 @@ function EditCommentPage() {
           </Button>
           <Button
             type="submit"
-            disabled={emptyFields(content)}
+            disabled={emptyFields(content) || loading}
             className="field-button"
           >
-            Save
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
           </Button>
         </div>
       </form>

@@ -4,12 +4,13 @@ import { createPost } from "../services/api";
 import "./Pages.css";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { emptyFields, handleApiError } from "../components/common/Functions";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 
 function CreatePostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const { topic_id } = useParams();
@@ -20,6 +21,7 @@ function CreatePostPage() {
     setError("");
 
     try {
+      setLoading(true);
       await createPost(topicId, title, content);
       navigate(`/topics/${topicId}`);
     } catch (err) {
@@ -27,6 +29,8 @@ function CreatePostPage() {
       if (errorMessage) {
         setError(errorMessage);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -61,8 +65,8 @@ function CreatePostPage() {
           <Button type="button" onClick={() => navigate(`/topics/${topicId}`)}>
             Back
           </Button>
-          <Button type="submit" disabled={emptyFields(title, content)}>
-            Create
+          <Button type="submit" disabled={emptyFields(title, content) || loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Create"}
           </Button>
         </div>
       </form>

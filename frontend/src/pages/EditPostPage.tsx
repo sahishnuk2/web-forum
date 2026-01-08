@@ -3,13 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { editPost, fetchSinglePost } from "../services/api";
 import "./Pages.css";
 import { emptyFields, handleApiError } from "../components/common/Functions";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import ErrorMessage from "../components/common/ErrorMessage";
 
 function EditPostPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const { topic_id, post_id } = useParams();
@@ -37,6 +38,7 @@ function EditPostPage() {
     setError("");
 
     try {
+      setLoading(true);
       await editPost(postId, title, content);
       navigate(`/topics/${topicId}`);
     } catch (err) {
@@ -44,6 +46,8 @@ function EditPostPage() {
       if (errorMessage) {
         setError(errorMessage);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -78,8 +82,8 @@ function EditPostPage() {
           <Button type="button" onClick={() => navigate(`/topics/${topicId}`)}>
             Back
           </Button>
-          <Button type="submit" disabled={emptyFields(title, content)}>
-            Save
+          <Button type="submit" disabled={emptyFields(title, content) || loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Save"}
           </Button>
         </div>
       </form>

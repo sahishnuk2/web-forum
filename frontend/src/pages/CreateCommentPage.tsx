@@ -3,11 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { createComment } from "../services/api";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { emptyFields, handleApiError } from "../components/common/Functions";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 
 function CreateCommentPage() {
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { topic_id, post_id } = useParams();
   const topicId = Number(topic_id);
@@ -18,6 +19,7 @@ function CreateCommentPage() {
     setError("");
 
     try {
+      setLoading(true);
       await createComment(postId, content);
       navigate(`/topics/${topicId}/${postId}`);
     } catch (err) {
@@ -25,6 +27,8 @@ function CreateCommentPage() {
       if (errorMessage) {
         setError(errorMessage);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -53,7 +57,7 @@ function CreateCommentPage() {
             Back
           </Button>
           <Button type="submit" disabled={emptyFields(content)}>
-            Create
+            {loading ? <CircularProgress sx={{ color: "white" }} /> : "Create"}
           </Button>
         </div>
       </form>

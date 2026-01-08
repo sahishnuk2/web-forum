@@ -4,11 +4,12 @@ import { createTopic } from "../services/api";
 import "./Pages.css";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { emptyFields, handleApiError } from "../components/common/Functions";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 
 function CreateTopicPage() {
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -16,6 +17,7 @@ function CreateTopicPage() {
     setError("");
 
     try {
+      setLoading(true);
       await createTopic(title);
       navigate("/topics");
     } catch (err) {
@@ -23,6 +25,8 @@ function CreateTopicPage() {
       if (errorMessage) {
         setError(errorMessage);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -45,8 +49,8 @@ function CreateTopicPage() {
             <Button type="button" onClick={() => navigate("/topics")}>
               Back
             </Button>
-            <Button type="submit" disabled={emptyFields(title)}>
-              Create
+            <Button type="submit" disabled={emptyFields(title) || loading}>
+              {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Create"}
             </Button>
           </div>
         </div>
