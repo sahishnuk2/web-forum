@@ -3,7 +3,7 @@ import { signUp } from "../services/api";
 import "./Pages.css";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
-import { Button, TextField } from "@mui/material";
+import { Button, CircularProgress, TextField } from "@mui/material";
 import { emptyFields } from "../components/common/Functions";
 
 function SignUpPage() {
@@ -11,6 +11,7 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
   const [verifiedPassword, setVerifiedPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   function notFulfillUsername(): boolean {
@@ -38,12 +39,15 @@ function SignUpPage() {
     e.preventDefault();
     setError("");
     try {
+      setLoading(true);
       await signUp(username, password);
       navigate("/login");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -109,7 +113,7 @@ function SignUpPage() {
             passwordsNotMatch()
           }
         >
-          SIGN UP
+          {loading ? <CircularProgress sx={{ color: "white" }} /> : "SIGN UP"}
         </Button>
 
         <p className="auth-link">

@@ -3,7 +3,7 @@ import { login, validate } from "../services/api";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../components/common/ErrorMessage";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, CircularProgress } from "@mui/material";
 import "./Pages.css";
 import { emptyFields } from "../components/common/Functions";
 
@@ -11,12 +11,14 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     try {
+      setLoading(true);
       const data = await login(username, password);
       localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/topics");
@@ -24,6 +26,8 @@ function LoginPage() {
       if (err instanceof Error) {
         setError(err.message);
       }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -73,7 +77,7 @@ function LoginPage() {
           className="auth-button"
           disabled={emptyFields(username, password)}
         >
-          LOGIN
+          {loading ? <CircularProgress sx={{ color: "white" }} /> : "LOGIN"}
         </Button>
 
         <p className="auth-link">
