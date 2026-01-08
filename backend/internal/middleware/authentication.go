@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 	"web-forum/internal/database"
 	"web-forum/internal/handlers"
@@ -42,9 +43,21 @@ func RequireAuthentication(c *gin.Context) {
 			return
 		}
 
+		sub, ok := claims["subject"].(float64)
+		if !ok {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		userID := int(sub)
+
 		// Find the user with the token subject
 		var user handlers.User
-		database.GetDB().QueryRow(`SELECT id, username, password, created_at FROM users WHERE id = $1`, claims["subject"]).Scan(&user.ID, &user.Username, &user.Password, &user.CreatedAt)
+		_, err := database.GetClient().From("users").Select("id, username, password, created_at", "", false).Eq("id", strconv.Itoa(userID)).Single().ExecuteTo(&user)
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 
 		if user.ID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)

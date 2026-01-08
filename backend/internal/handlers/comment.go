@@ -1,123 +1,126 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
-	"time"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/supabase-community/supabase-go"
 )
 
 type Comment struct {
-	ID int				`json:"id"`
-	PostID int			`json:"post_id"`
-	Content string		`json:"content" binding:"required"`
-	CreatedBy int		`json:"created_by"`
-	CreatedAt time.Time	`json:"created_at"`
-	UpdatedAt time.Time	`json:"updated_at"`
-	Username string		`json:"username"`
+	ID        int    `json:"id"`
+	PostID    int    `json:"post_id"`
+	Content   string `json:"content" binding:"required"`
+	CreatedBy int    `json:"created_by"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Users     struct {
+		Username string `json:"username"`
+	} `json:"users"`
 }
 
-func GetComments(db *sql.DB) gin.HandlerFunc {
+type FlatComment struct {
+	ID        int    `json:"id"`
+	PostID    int    `json:"post_id"`
+	Content   string `json:"content" binding:"required"`
+	CreatedBy int    `json:"created_by"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Username  string `json:"username"`
+}
+
+func GetComments(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		postID := c.Query("post_id")
+		var comments []Comment
+
 		if postID == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "post_id is required"})
-            return
-		}
-
-		query := `
-		SELECT 
-			comments.id, 
-			comments.post_id,
-			comments.content, 
-			comments.created_by, 
-			comments.created_at, 
-			comments.updated_at,
-			users.username 
-		FROM comments 
-		INNER JOIN users ON comments.created_by = users.id
-		WHERE comments.post_id = $1
-		`
-
-		rows, err := db.Query(query, postID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
-            return
-		}
-		defer rows.Close()
-
-		comments := make([]Comment, 0)
-		for rows.Next() {
-			var comment Comment
-			if err := rows.Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt, &comment.Username); err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while scanning comments"})
-				return
-			}
-			comments = append(comments, comment)
-		}
-
-		if err := rows.Err(); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error during retrieval"})
 			return
 		}
 
-		c.JSON(http.StatusOK, comments)
+		_, err := client.From("comments").Select(`id, post_id, content, created_by, created_at, updated_at, users(username)`, "", false).Eq("post_id", postID).ExecuteTo(&comments)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
+			return
+		}
+
+		flatComments := make([]FlatComment, len(comments))
+		for i, comment := range comments {
+			flatComments[i] = FlatComment{
+				ID:        comment.ID,
+				PostID:    comment.PostID,
+				Content:   comment.Content,
+				CreatedBy: comment.CreatedBy,
+				CreatedAt: comment.CreatedAt,
+				UpdatedAt: comment.UpdatedAt,
+				Username:  comment.Users.Username,
+			}
+		}
+
+		c.JSON(http.StatusOK, flatComments)
 	}
 }
 
-func GetComment(db *sql.DB) gin.HandlerFunc {
+func GetComment(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		commentID := c.Param("id")
 
 		if commentID == "" {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "comment_id is required"})
-            return
+			c.JSON(http.StatusBadRequest, gin.H{"error": "comment_id is required"})
+			return
 		}
 		var comment Comment
 
-		query := `
-		SELECT 
-			comments.id, 
-			comments.post_id,
-			comments.content, 
-			comments.created_by, 
-			comments.created_at, 
-			comments.updated_at,
-			users.username 
-		FROM comments 
-		INNER JOIN users ON comments.created_by = users.id
-		WHERE comments.id = $1
-		`
-
-		err := db.QueryRow(query, commentID).Scan(&comment.ID, &comment.PostID, &comment.Content, &comment.CreatedBy, &comment.CreatedAt, &comment.UpdatedAt, &comment.Username)
-		if err == sql.ErrNoRows {
-      		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
-      		return
-  		}
+		_, err := client.From("comments").Select(`id, post_id, content, created_by, created_at, updated_at, users(username)`, "", false).Eq("id", commentID).Single().ExecuteTo(&comment)
 
 		if err != nil {
+			if strings.Contains(err.Error(), "PGRST116") || strings.Contains(err.Error(), "0 rows") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+				return
+			}
+
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comment"})
-            return
+			return
 		}
-		c.JSON(http.StatusOK, comment)
+
+		flatComment := FlatComment{
+			ID:        comment.ID,
+			PostID:    comment.PostID,
+			Content:   comment.Content,
+			CreatedBy: comment.CreatedBy,
+			CreatedAt: comment.CreatedAt,
+			UpdatedAt: comment.UpdatedAt,
+			Username:  comment.Users.Username,
+		}
+
+		c.JSON(http.StatusOK, flatComment)
 	}
 }
 
-func CreateComment(db *sql.DB) gin.HandlerFunc {
+func CreateComment(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var comment Comment
 
 		if err := c.BindJSON(&comment); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input."})
-            return
+			return
 		}
 
 		user, _ := c.Get("user")
 		currentUser := user.(User)
 		userID := currentUser.ID
 
-		_, err := db.Exec(`INSERT INTO comments (post_id, content, created_by) VALUES ($1, $2, $3)`, comment.PostID, comment.Content, userID)
+		data := map[string]interface{}{
+			"post_id":    comment.PostID,
+			"content":    comment.Content,
+			"created_by": userID,
+		}
+
+		_, _, err := client.From("comments").Insert(data, false, "", "", "").Execute()
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create comment"})
 			return
@@ -127,12 +130,12 @@ func CreateComment(db *sql.DB) gin.HandlerFunc {
 	}
 }
 
-func UpdateComments(db *sql.DB) gin.HandlerFunc {
+func UpdateComment(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
 		var input struct {
-			Content string 	`json:"content" binding:"required"`
+			Content string `json:"content" binding:"required"`
 		}
 
 		if err := c.BindJSON(&input); err != nil {
@@ -144,35 +147,41 @@ func UpdateComments(db *sql.DB) gin.HandlerFunc {
 		currentUser := user.(User)
 		userID := currentUser.ID
 
-		var createdBy int
-		err := db.QueryRow(`SELECT created_by FROM comments WHERE id = $1`, id).Scan(&createdBy)
-		
-		if err == sql.ErrNoRows {
-      		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
-      		return
-  		}
+		var result struct {
+			CreatedBy int `json:"created_by"`
+		}
+		_, err := client.From("comments").Select("created_by", "", false).Eq("id", id).Single().ExecuteTo(&result)
 
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comment"})
-            return
+			if strings.Contains(err.Error(), "PGRST116") || strings.Contains(err.Error(), "0 rows") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+				return
+			}
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update comment"})
+			return
 		}
 
-		if createdBy != userID {
+		if result.CreatedBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only edit comments created by you"})
-            return
+			return
 		}
 
-		_, err = db.Exec(`UPDATE comments SET content = $1, updated_at = NOW() WHERE id = $2`, input.Content, id)
+		data := map[string]interface{}{
+			"content": input.Content,
+		}
+		_, _, err = client.From("comments").Update(data, "", "").Eq("id", id).Execute()
+
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to edit comment"})
-            return
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "Comment edited successfully"})
 	}
 }
 
-func DeleteComments(db *sql.DB) gin.HandlerFunc {
+func DeleteComment(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
@@ -180,28 +189,30 @@ func DeleteComments(db *sql.DB) gin.HandlerFunc {
 		currentUser := user.(User)
 		userID := currentUser.ID
 
-		var createdBy int
-		err := db.QueryRow(`SELECT created_by FROM comments WHERE id = $1`, id).Scan(&createdBy)
-		
-		if err == sql.ErrNoRows {
-      		c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
-      		return
-  		}
+		var result struct {
+			CreatedBy int `json:"created_by"`
+		}
+		_, err := client.From("comments").Select("created_by", "", false).Eq("id", id).Single().ExecuteTo(&result)
 
 		if err != nil {
+			if strings.Contains(err.Error(), "PGRST116") || strings.Contains(err.Error(), "0 rows") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+				return
+			}
+
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comment"})
-            return
+			return
 		}
 
-		if createdBy != userID {
+		if result.CreatedBy != userID {
 			c.JSON(http.StatusForbidden, gin.H{"error": "You can only delete comments created by you"})
-            return
+			return
 		}
 
-		_, err = db.Exec(`DELETE FROM comments WHERE id = $1`, id)
+		_, _, err = client.From("comments").Delete("", "").Eq("id", id).Execute()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete comment"})
-            return
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
