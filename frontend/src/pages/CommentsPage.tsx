@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import CommentsList from "../components/comments/CommentsList";
-import { Button } from "@mui/material";
+import { Box, Button, CircularProgress } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PostCard from "../components/posts/PostCard";
 import { useEffect, useState } from "react";
@@ -18,10 +18,12 @@ function CommentsPage() {
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadPost() {
       try {
+        setLoading(true);
         const data = await fetchSinglePost(postId);
         setPost(data);
       } catch (err) {
@@ -29,6 +31,8 @@ function CommentsPage() {
         if (errorMessage) {
           setError(errorMessage);
         }
+      } finally {
+        setLoading(false);
       }
     }
     loadPost();
@@ -57,14 +61,29 @@ function CommentsPage() {
         </Button>
       </div>
       <div className="comments-post">
-        {post && (
-          <PostCard
-            key={postId}
-            {...post}
-            currentUserId={getCurrentUserId()}
-            onDelete={null}
-            disableButtons={true}
-          />
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgress sx={{ color: "#006f80" }} />
+            <p>Loading post</p>
+          </Box>
+        ) : (
+          post && (
+            <PostCard
+              key={postId}
+              {...post}
+              currentUserId={getCurrentUserId()}
+              onDelete={null}
+              disableButtons={true}
+            />
+          )
         )}
         {error && <ErrorMessage error={error} />}
       </div>

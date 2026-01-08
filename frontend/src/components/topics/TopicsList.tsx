@@ -5,13 +5,16 @@ import ErrorMessage from "../common/ErrorMessage";
 import { handleApiError } from "../common/Functions";
 import TopicCard from "./TopicCard";
 import { useEffect, useState } from "react";
+import { Box, CircularProgress } from "@mui/material";
 
 function TopicsList() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     fetchTopics()
       .then((data) => setTopics(data))
       .catch((err) => {
@@ -19,22 +22,41 @@ function TopicsList() {
         if (errorMessage) {
           setError(errorMessage);
         }
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <div>
-      {error && <ErrorMessage error={error} />}
-      {topics.map((topic) => (
-        <TopicCard
-          key={topic.id}
-          id={topic.id}
-          title={topic.title}
-          created_by={topic.created_by}
-          created_at={topic.created_at}
-        />
-      ))}
-    </div>
+    <>
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            minHeight: "50vh",
+            gap: 2,
+          }}
+        >
+          <CircularProgress sx={{ color: "#006f80" }} />
+          <p>Loading topics</p>
+        </Box>
+      ) : (
+        <div>
+          {error && <ErrorMessage error={error} />}
+          {topics.map((topic) => (
+            <TopicCard
+              key={topic.id}
+              id={topic.id}
+              title={topic.title}
+              created_by={topic.created_by}
+              created_at={topic.created_at}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
