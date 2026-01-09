@@ -147,15 +147,50 @@ func GetPost(client *supabase.Client) gin.HandlerFunc {
 			return
 		}
 
+		type PostReactionRow struct {
+			PostID   int `json:"post_id"`
+			UserID   int `json:"user_id"`
+			Reaction int `json:"reaction"`
+		}
+
+		var reactions []PostReactionRow
+
+		_, err = client.From("post_reactions").Select("post_id, user_id, reaction", "", false).Eq("post_id", postID).ExecuteTo(&reactions)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reactions"})
+			return
+		}
+
 		flatPost := FlatPost{
-			ID:        post.ID,
-			TopicID:   post.TopicID,
-			Title:     post.Title,
-			Content:   post.Content,
-			CreatedBy: post.CreatedBy,
-			CreatedAt: post.CreatedAt,
-			UpdatedAt: post.UpdatedAt,
-			Username:  post.Users.Username,
+			ID:           post.ID,
+			TopicID:      post.TopicID,
+			Title:        post.Title,
+			Content:      post.Content,
+			CreatedBy:    post.CreatedBy,
+			CreatedAt:    post.CreatedAt,
+			UpdatedAt:    post.UpdatedAt,
+			Username:     post.Users.Username,
+			LikeCount:    0,
+			DislikeCount: 0,
+			UserReaction: nil,
+		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		for _, reaction := range reactions {
+			if reaction.Reaction == 1 {
+				flatPost.LikeCount++
+			} else if reaction.Reaction == -1 {
+				flatPost.DislikeCount++
+			}
+
+			if reaction.UserID == userID {
+				r := reaction.Reaction
+				flatPost.UserReaction = &r
+			}
 		}
 
 		c.JSON(http.StatusOK, flatPost)
