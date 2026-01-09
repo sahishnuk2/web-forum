@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,14 +25,17 @@ type Post struct {
 }
 
 type FlatPost struct {
-	ID        int    `json:"id"`
-	TopicID   int    `json:"topic_id"`
-	Title     string `json:"title" binding:"required"`
-	Content   string `json:"content" binding:"required"`
-	CreatedBy int    `json:"created_by"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Username  string `json:"username"`
+	ID           int    `json:"id"`
+	TopicID      int    `json:"topic_id"`
+	Title        string `json:"title" binding:"required"`
+	Content      string `json:"content" binding:"required"`
+	CreatedBy    int    `json:"created_by"`
+	CreatedAt    string `json:"created_at"`
+	UpdatedAt    string `json:"updated_at"`
+	Username     string `json:"username"`
+	LikeCount    int    `json:"like_count"`
+	DislikeCount int    `json:"dislike_count"`
+	UserReaction *int   `json:"user_reaction"`
 }
 
 func GetPosts(client *supabase.Client) gin.HandlerFunc {
@@ -51,17 +55,70 @@ func GetPosts(client *supabase.Client) gin.HandlerFunc {
 			return
 		}
 
+		postIDs := make([]string, 0, len(posts))
+		for _, post := range posts {
+			postIDs = append(postIDs, strconv.Itoa(post.ID))
+		}
+
+		type PostReactionRow struct {
+			PostID   int `json:"post_id"`
+			UserID   int `json:"user_id"`
+			Reaction int `json:"reaction"`
+		}
+
+		var reactions []PostReactionRow
+
+		if len(postIDs) > 0 {
+			_, err = client.From("post_reactions").Select("post_id, user_id, reaction", "", false).In("post_id", postIDs).ExecuteTo(&reactions)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reactions"})
+				return
+			}
+		}
+
 		flatPosts := make([]FlatPost, len(posts))
 		for i, post := range posts {
 			flatPosts[i] = FlatPost{
-				ID:        post.ID,
-				TopicID:   post.TopicID,
-				Title:     post.Title,
-				Content:   post.Content,
-				CreatedBy: post.CreatedBy,
-				CreatedAt: post.CreatedAt,
-				UpdatedAt: post.UpdatedAt,
-				Username:  post.Users.Username,
+				ID:           post.ID,
+				TopicID:      post.TopicID,
+				Title:        post.Title,
+				Content:      post.Content,
+				CreatedBy:    post.CreatedBy,
+				CreatedAt:    post.CreatedAt,
+				UpdatedAt:    post.UpdatedAt,
+				Username:     post.Users.Username,
+				LikeCount:    0,
+				DislikeCount: 0,
+				UserReaction: nil,
+			}
+		}
+
+		postMap := make(map[int]*FlatPost)
+		// Faster to search for specific post
+		for i := range flatPosts {
+			postMap[flatPosts[i].ID] = &flatPosts[i]
+		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		for _, reaction := range reactions {
+			post := postMap[reaction.PostID]
+			if post == nil {
+				continue
+			}
+
+			if reaction.Reaction == 1 {
+				post.LikeCount++
+			} else if reaction.Reaction == -1 {
+				post.DislikeCount++
+			}
+
+			if reaction.UserID == userID {
+				r := reaction.Reaction
+				post.UserReaction = &r
 			}
 		}
 
