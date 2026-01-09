@@ -178,6 +178,24 @@ export const deletePost = async (post_id: number) => {
   return handleResponse(response, "Failed to delete post");
 };
 
+export const createPostReaction = async (post_id: number, reaction: number) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/posts/${post_id}/reactions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        reaction,
+      }),
+    }
+  );
+
+  return handleResponse(response, "Failed to react to post");
+};
+
 // Comments
 export const fetchComments = async (post_id: number) => {
   const response = await fetch(
@@ -239,6 +257,27 @@ export const deleteComment = async (comment_id: number) => {
   });
 
   return handleResponse(response, "Failed to delete comment");
+};
+
+export const createCommentReaction = async (
+  comment_id: number,
+  reaction: number
+) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/comments/${comment_id}/reactions`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        reaction,
+      }),
+    }
+  );
+
+  return handleResponse(response, "Failed to react to comment");
 };
 
 // Validation

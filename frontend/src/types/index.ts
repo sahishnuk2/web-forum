@@ -24,6 +24,10 @@ export interface Post {
   created_at: string;
   updated_at: string;
   username: string;
+  like_count: number;
+  dislike_count: number;
+  net_score: number;
+  user_reaction: number | null;
 }
 
 // Comment
@@ -35,4 +39,8 @@ export interface Comment {
   created_at: string;
   updated_at: string;
   username: string;
+  like_count: number;
+  dislike_count: number;
+  net_score: number;
+  user_reaction: number | null;
 }
