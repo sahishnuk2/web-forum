@@ -56,8 +56,8 @@ function CreateCommentPage() {
           >
             Back
           </Button>
-          <Button type="submit" disabled={emptyFields(content)}>
-            {loading ? <CircularProgress sx={{ color: "white" }} /> : "Create"}
+          <Button type="submit" disabled={emptyFields(content) || loading}>
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Create"}
           </Button>
         </div>
       </form>
