@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,13 +22,17 @@ type Comment struct {
 }
 
 type FlatComment struct {
-	ID        int    `json:"id"`
-	PostID    int    `json:"post_id"`
-	Content   string `json:"content" binding:"required"`
-	CreatedBy int    `json:"created_by"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Username  string `json:"username"`
+	ID           int    `json:"id"`
+	PostID       int    `json:"post_id"`
+	Content      string `json:"content" binding:"required"`
+	CreatedBy    int    `json:"created_by"`
+	CreatedAt    string `json:"created_at"`
+	UpdatedAt    string `json:"updated_at"`
+	Username     string `json:"username"`
+	LikeCount    int    `json:"like_count"`
+	DislikeCount int    `json:"dislike_count"`
+	NetScore     int    `json:"net_score"`
+	UserReaction *int   `json:"user_reaction"`
 }
 
 func GetComments(client *supabase.Client) gin.HandlerFunc {
@@ -47,16 +52,72 @@ func GetComments(client *supabase.Client) gin.HandlerFunc {
 			return
 		}
 
+		commentIDs := make([]string, 0, len(comments))
+		for _, comment := range comments {
+			commentIDs = append(commentIDs, strconv.Itoa(comment.ID))
+		}
+
+		type CommentReactionRow struct {
+			CommentID int `json:"comment_id"`
+			UserID    int `json:"user_id"`
+			Reaction  int `json:"reaction"`
+		}
+
+		var reactions []CommentReactionRow
+
+		if len(commentIDs) > 0 {
+			_, err = client.From("comment_reactions").Select("comment_id, user_id, reaction", "", false).In("comment_id", commentIDs).ExecuteTo(&reactions)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reactions"})
+				return
+			}
+		}
+
 		flatComments := make([]FlatComment, len(comments))
 		for i, comment := range comments {
 			flatComments[i] = FlatComment{
-				ID:        comment.ID,
-				PostID:    comment.PostID,
-				Content:   comment.Content,
-				CreatedBy: comment.CreatedBy,
-				CreatedAt: comment.CreatedAt,
-				UpdatedAt: comment.UpdatedAt,
-				Username:  comment.Users.Username,
+				ID:           comment.ID,
+				PostID:       comment.PostID,
+				Content:      comment.Content,
+				CreatedBy:    comment.CreatedBy,
+				CreatedAt:    comment.CreatedAt,
+				UpdatedAt:    comment.UpdatedAt,
+				Username:     comment.Users.Username,
+				LikeCount:    0,
+				DislikeCount: 0,
+				NetScore:     0,
+				UserReaction: nil,
+			}
+		}
+
+		postMap := make(map[int]*FlatComment)
+		// Faster to search for specific post
+		for i := range flatComments {
+			postMap[flatComments[i].ID] = &flatComments[i]
+		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		for _, reaction := range reactions {
+			comment := postMap[reaction.CommentID]
+			if comment == nil {
+				continue
+			}
+
+			if reaction.Reaction == 1 {
+				comment.LikeCount++
+				comment.NetScore++
+			} else if reaction.Reaction == -1 {
+				comment.DislikeCount++
+				comment.NetScore--
+			}
+
+			if reaction.UserID == userID {
+				r := reaction.Reaction
+				comment.UserReaction = &r
 			}
 		}
 
@@ -86,14 +147,52 @@ func GetComment(client *supabase.Client) gin.HandlerFunc {
 			return
 		}
 
+		type CommentReactionRow struct {
+			CommentID int `json:"comment_id"`
+			UserID    int `json:"user_id"`
+			Reaction  int `json:"reaction"`
+		}
+
+		var reactions []CommentReactionRow
+
+		_, err = client.From("comment_reactions").Select("comment_id, user_id, reaction", "", false).Eq("comment_id", commentID).ExecuteTo(&reactions)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch reactions"})
+			return
+		}
+
 		flatComment := FlatComment{
-			ID:        comment.ID,
-			PostID:    comment.PostID,
-			Content:   comment.Content,
-			CreatedBy: comment.CreatedBy,
-			CreatedAt: comment.CreatedAt,
-			UpdatedAt: comment.UpdatedAt,
-			Username:  comment.Users.Username,
+			ID:           comment.ID,
+			PostID:       comment.PostID,
+			Content:      comment.Content,
+			CreatedBy:    comment.CreatedBy,
+			CreatedAt:    comment.CreatedAt,
+			UpdatedAt:    comment.UpdatedAt,
+			Username:     comment.Users.Username,
+			LikeCount:    0,
+			DislikeCount: 0,
+			NetScore:     0,
+			UserReaction: nil,
+		}
+
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		for _, reaction := range reactions {
+			if reaction.Reaction == 1 {
+				flatComment.LikeCount++
+				flatComment.NetScore++
+			} else if reaction.Reaction == -1 {
+				flatComment.DislikeCount++
+				flatComment.NetScore--
+			}
+
+			if reaction.UserID == userID {
+				r := reaction.Reaction
+				flatComment.UserReaction = &r
+			}
 		}
 
 		c.JSON(http.StatusOK, flatComment)
