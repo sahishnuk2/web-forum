@@ -60,5 +60,9 @@ func SetUpRouter() *gin.Engine {
 	router.PUT("/api/comments/:id", middleware.RequireAuthentication, handlers.UpdateComment(client))
 	router.DELETE("/api/comments/:id", middleware.RequireAuthentication, handlers.DeleteComment(client))
 
+	// Reactions
+	router.POST("api/posts/:id/reactions", middleware.RequireAuthentication, handlers.CreatePostReaction(client))
+	router.POST("api/comments/:id/reactions", middleware.RequireAuthentication, handlers.CreateCommentReaction(client))
+
 	return router
 }
