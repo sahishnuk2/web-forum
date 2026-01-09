@@ -35,6 +35,7 @@ type FlatPost struct {
 	Username     string `json:"username"`
 	LikeCount    int    `json:"like_count"`
 	DislikeCount int    `json:"dislike_count"`
+	NetScore     int    `json:"net_score"`
 	UserReaction *int   `json:"user_reaction"`
 }
 
@@ -90,6 +91,7 @@ func GetPosts(client *supabase.Client) gin.HandlerFunc {
 				Username:     post.Users.Username,
 				LikeCount:    0,
 				DislikeCount: 0,
+				NetScore:     0,
 				UserReaction: nil,
 			}
 		}
@@ -112,8 +114,10 @@ func GetPosts(client *supabase.Client) gin.HandlerFunc {
 
 			if reaction.Reaction == 1 {
 				post.LikeCount++
+				post.NetScore++
 			} else if reaction.Reaction == -1 {
 				post.DislikeCount++
+				post.NetScore--
 			}
 
 			if reaction.UserID == userID {
@@ -173,6 +177,7 @@ func GetPost(client *supabase.Client) gin.HandlerFunc {
 			Username:     post.Users.Username,
 			LikeCount:    0,
 			DislikeCount: 0,
+			NetScore:     0,
 			UserReaction: nil,
 		}
 
@@ -183,8 +188,10 @@ func GetPost(client *supabase.Client) gin.HandlerFunc {
 		for _, reaction := range reactions {
 			if reaction.Reaction == 1 {
 				flatPost.LikeCount++
+				flatPost.NetScore++
 			} else if reaction.Reaction == -1 {
 				flatPost.DislikeCount++
+				flatPost.NetScore--
 			}
 
 			if reaction.UserID == userID {
