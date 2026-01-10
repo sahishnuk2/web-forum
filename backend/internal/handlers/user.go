@@ -105,7 +105,7 @@ func Login(client *supabase.Client) gin.HandlerFunc {
 		isProduction := os.Getenv("ENVIRONMENT") == "production"
 		if isProduction {
 			c.SetSameSite(http.SameSiteNoneMode)
-			c.SetCookie("Authorisation", tokenString, 3600*24*30, "/", "", true, true)
+			c.SetCookie("Authorisation", tokenString, 3600*24*30, "/", ".forum.sahishnu.dev", true, true)
 		} else {
 			c.SetSameSite(http.SameSiteLaxMode)
 			c.SetCookie("Authorisation", tokenString, 3600*24*30, "/", "", false, true)
@@ -138,7 +138,7 @@ func LogOut(c *gin.Context) {
 	isProduction := os.Getenv("ENVIRONMENT") == "production"
 	if isProduction {
 		c.SetSameSite(http.SameSiteNoneMode)
-		c.SetCookie("Authorisation", "", 3600*24*30, "/", "", true, true)
+		c.SetCookie("Authorisation", "", 3600*24*30, "/", ".forum.sahishnu.dev", true, true)
 	} else {
 		c.SetSameSite(http.SameSiteLaxMode)
 		c.SetCookie("Authorisation", "", 3600*24*30, "/", "", false, true)
