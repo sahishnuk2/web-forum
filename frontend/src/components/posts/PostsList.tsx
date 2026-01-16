@@ -1,12 +1,11 @@
 import type { Post } from "../../types";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { fetchPosts } from "../../services/api";
 import getCurrentUserId, { handleApiError } from "../common/Functions";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
 import { Box, CircularProgress, MenuItem, Select } from "@mui/material";
-import { Password } from "@mui/icons-material";
 
 interface PostsListProp {
   topic_id: number;
