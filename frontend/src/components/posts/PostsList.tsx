@@ -1,11 +1,12 @@
 import type { Post } from "../../types";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import PostCard from "./PostCard";
 import { fetchPosts } from "../../services/api";
 import getCurrentUserId, { handleApiError } from "../common/Functions";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, MenuItem, Select } from "@mui/material";
+import { Password } from "@mui/icons-material";
 
 interface PostsListProp {
   topic_id: number;
@@ -15,6 +16,9 @@ function PostsList({ topic_id }: PostsListProp) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<
+    "likes" | "net_score" | "newest" | "oldest"
+  >("newest");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +33,47 @@ function PostsList({ topic_id }: PostsListProp) {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const sortedPosts = [...posts].sort((a, b) => {
+    switch (sortBy) {
+      case "likes":
+        return b.like_count - a.like_count;
+      case "newest":
+        return (
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
+        );
+      case "net_score":
+        return b.net_score - a.net_score;
+      default:
+        return (
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+    }
+  });
+
+  const handleReactionUpdate = (
+    postId: number,
+    newLikeCount: number,
+    newDislikeCount: number,
+    newNetScore: number
+  ) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              like_count: newLikeCount,
+              dislike_count: newDislikeCount,
+              net_score: newNetScore,
+            }
+          : post
+      )
+    );
+  };
 
   return (
     <>
@@ -49,10 +94,47 @@ function PostsList({ topic_id }: PostsListProp) {
       ) : (
         <div style={{ alignContent: "center" }}>
           {error && <ErrorMessage error={error} />}
-          {posts.map((post) => (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginBottom: 2,
+              paddingRight: 2,
+            }}
+          >
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              size="small"
+              sx={{
+                minWidth: 200,
+                color: "#006f80",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#005f6e",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "& .MuiSelect-icon": {
+                  color: "#006f80",
+                },
+              }}
+            >
+              <MenuItem value="net_score">Popular (Net Score)</MenuItem>
+              <MenuItem value="likes">Most Liked</MenuItem>
+              <MenuItem value="newest">Newest First</MenuItem>
+              <MenuItem value="oldest">Oldest First</MenuItem>
+            </Select>
+          </Box>
+          {sortedPosts.map((post) => (
             <PostCard
               key={post.id}
               {...post}
+              onReactionUpdate={handleReactionUpdate}
               currentUserId={getCurrentUserId()}
               onDelete={() =>
                 setPosts((prev) => prev.filter((p) => p.id !== post.id))
