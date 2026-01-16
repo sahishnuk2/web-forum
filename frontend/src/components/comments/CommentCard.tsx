@@ -25,8 +25,18 @@ function CommentCard({
   dislike_count,
   user_reaction,
   currentUserId,
+  onReactionUpdate,
   onDelete,
-}: Comment & { currentUserId: number; onDelete: () => void }) {
+}: Comment & {
+  currentUserId: number;
+  onDelete: () => void;
+  onReactionUpdate: (
+    commentId: number,
+    likes: number,
+    dislikes: number,
+    netScore: number
+  ) => void;
+}) {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [likesCount, setLikesCount] = useState(like_count);
@@ -63,19 +73,26 @@ function CommentCard({
       await createCommentReaction(id, 1);
 
       if (userReaction === 1) {
-        setLikesCount((p) => p - 1);
+        const newLikes = likesCount - 1;
+        setLikesCount(newLikes);
         setUserReaction(null);
+        onReactionUpdate(id, newLikes, dislikesCount, newLikes - dislikesCount);
         return;
       }
       if (userReaction === -1) {
-        setDislikesCount((p) => p - 1);
-        setLikesCount((p) => p + 1);
+        const newLikes = likesCount + 1;
+        const newDislikes = dislikesCount - 1;
+        setDislikesCount(newDislikes);
+        setLikesCount(newLikes);
         setUserReaction(1);
+        onReactionUpdate(id, newLikes, newDislikes, newLikes - newDislikes);
         return;
       }
 
-      setLikesCount((p) => p + 1);
+      const newLikes = likesCount + 1;
+      setLikesCount(newLikes);
       setUserReaction(1);
+      onReactionUpdate(id, newLikes, dislikesCount, newLikes - dislikesCount);
       return;
     } catch (err) {
       const errorMessage = handleApiError(err, navigate);
@@ -90,19 +107,26 @@ function CommentCard({
       await createCommentReaction(id, -1);
 
       if (userReaction === -1) {
-        setDislikesCount((p) => p - 1);
+        const newDislikes = dislikesCount - 1;
+        setDislikesCount(newDislikes);
         setUserReaction(null);
+        onReactionUpdate(id, likesCount, newDislikes, likesCount - newDislikes);
         return;
       }
       if (userReaction === 1) {
-        setDislikesCount((p) => p + 1);
-        setLikesCount((p) => p - 1);
+        const newDislikes = dislikesCount + 1;
+        const newLikes = likesCount - 1;
+        setDislikesCount(newDislikes);
+        setLikesCount(newLikes);
         setUserReaction(-1);
+        onReactionUpdate(id, newLikes, newDislikes, newLikes - newDislikes);
         return;
       }
 
-      setDislikesCount((p) => p + 1);
+      const newDislikes = dislikesCount + 1;
+      setDislikesCount(newDislikes);
       setUserReaction(-1);
+      onReactionUpdate(id, likesCount, newDislikes, likesCount - newDislikes);
     } catch (err) {
       const errorMessage = handleApiError(err, navigate);
       if (errorMessage) {

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/supabase-community/supabase-go"
@@ -267,7 +268,8 @@ func UpdateComment(client *supabase.Client) gin.HandlerFunc {
 		}
 
 		data := map[string]interface{}{
-			"content": input.Content,
+			"content":    input.Content,
+			"updated_at": time.Now(),
 		}
 		_, _, err = client.From("comments").Update(data, "", "").Eq("id", id).Execute()
 

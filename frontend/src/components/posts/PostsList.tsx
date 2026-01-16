@@ -108,7 +108,6 @@ function PostsList({ topic_id }: PostsListProp) {
               onChange={(e) => setSortBy(e.target.value)}
               size="small"
               sx={{
-                minWidth: 200,
                 color: "#006f80",
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: "#006f80",
@@ -124,7 +123,7 @@ function PostsList({ topic_id }: PostsListProp) {
                 },
               }}
             >
-              <MenuItem value="net_score">Popular (Net Score)</MenuItem>
+              <MenuItem value="net_score">Popular</MenuItem>
               <MenuItem value="likes">Most Liked</MenuItem>
               <MenuItem value="newest">Newest First</MenuItem>
               <MenuItem value="oldest">Oldest First</MenuItem>

@@ -5,7 +5,7 @@ import { fetchComments } from "../../services/api";
 import getCurrentUserId, { handleApiError } from "../common/Functions";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, MenuItem, Select } from "@mui/material";
 
 interface CommentsListProp {
   post_id: number;
@@ -15,6 +15,9 @@ function CommentsList({ post_id }: CommentsListProp) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sortBy, setSortBy] = useState<
+    "likes" | "net_score" | "newest" | "oldest"
+  >("newest");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +32,47 @@ function CommentsList({ post_id }: CommentsListProp) {
       })
       .finally(() => setLoading(false));
   }, [post_id]);
+
+  const sortedComments = [...comments].sort((a, b) => {
+    switch (sortBy) {
+      case "likes":
+        return b.like_count - a.like_count;
+      case "newest":
+        return (
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+      case "oldest":
+        return (
+          new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime()
+        );
+      case "net_score":
+        return b.net_score - a.net_score;
+      default:
+        return (
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+    }
+  });
+
+  const handleReactionUpdate = (
+    commentId: number,
+    newLikeCount: number,
+    newDislikeCount: number,
+    newNetScore: number
+  ) => {
+    setComments((prevComments) =>
+      prevComments.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              like_count: newLikeCount,
+              dislike_count: newDislikeCount,
+              net_score: newNetScore,
+            }
+          : comment
+      )
+    );
+  };
 
   return (
     <>
@@ -49,10 +93,46 @@ function CommentsList({ post_id }: CommentsListProp) {
       ) : (
         <div>
           {error && <ErrorMessage error={error} />}
-          {comments.map((comment) => (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginBottom: 2,
+              paddingRight: 2,
+            }}
+          >
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              size="small"
+              sx={{
+                color: "#006f80",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#005f6e",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "& .MuiSelect-icon": {
+                  color: "#006f80",
+                },
+              }}
+            >
+              <MenuItem value="net_score">Popular</MenuItem>
+              <MenuItem value="likes">Most Liked</MenuItem>
+              <MenuItem value="newest">Newest First</MenuItem>
+              <MenuItem value="oldest">Oldest First</MenuItem>
+            </Select>
+          </Box>
+          {sortedComments.map((comment) => (
             <CommentCard
               key={comment.id}
               {...comment}
+              onReactionUpdate={handleReactionUpdate}
               currentUserId={getCurrentUserId()}
               onDelete={() =>
                 setComments((prev) => prev.filter((c) => c.id !== comment.id))
