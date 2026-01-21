@@ -12,6 +12,7 @@ import CommentsPage from "./pages/CommentsPage";
 import CreateCommentPage from "./pages/CreateCommentPage";
 import EditPostPage from "./pages/EditPostPage";
 import EditCommentPage from "./pages/EditCommentPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
             path="/topics/:topic_id/:post_id/comments/:comment_id/edit"
             element={<EditCommentPage />}
           />
+          <Route path="/changepassword" element={<ResetPasswordPage />} />
         </Route>
         {/* Invalid Routes */}
         <Route path="*" element={<ErrorPage />} />

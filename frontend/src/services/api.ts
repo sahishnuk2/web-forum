@@ -81,7 +81,7 @@ export const logOut = async () => {
   return await response.json();
 };
 
-export const resetPassword = async (password: string) => {
+export const resetPassword = async (password: string, new_password: string) => {
   const response = await fetch(`${API_BASE_URL}/api/users/changepassword`, {
     method: "PUT",
     headers: {
@@ -90,6 +90,7 @@ export const resetPassword = async (password: string) => {
     credentials: "include",
     body: JSON.stringify({
       password,
+      new_password,
     }),
   });
 

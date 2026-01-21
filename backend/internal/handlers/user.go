@@ -123,6 +123,7 @@ func Login(client *supabase.Client) gin.HandlerFunc {
 	}
 }
 
+// Not done yet, need to get first password and check first before changing password
 func ResetPassword(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, _ := c.Get("user")
@@ -130,15 +131,39 @@ func ResetPassword(client *supabase.Client) gin.HandlerFunc {
 		userID := currentUser.ID
 
 		var input struct {
-			Password string `json:"password" binding:"required,min=8"`
+			Password    string `json:"password" binding:"required,min=8"`
+			NewPassword string `json:"new_password" binding:"required,min=8"`
 		}
 
 		if err := c.BindJSON(&input); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "New password invalid"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input"})
 			return
 		}
 
-		hashedPassword, err := hashPassword(input.Password)
+		// Check if password is correct
+		// If yes continue, else, show error saying wrong password
+		var result struct {
+			Password string `json:"password"`
+		}
+
+		_, err := client.From("users").Select("password", "", false).Eq("id", strconv.Itoa(userID)).Single().ExecuteTo(&result)
+
+		if err != nil {
+			if strings.Contains(err.Error(), "PGRST116") || strings.Contains(err.Error(), "0 rows") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				return
+			}
+
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+			return
+		}
+
+		if !comparePasswordAndHash(input.Password, result.Password) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid old password"})
+			return
+		}
+
+		hashedNewPassword, err := hashPassword(input.NewPassword)
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password"})
@@ -146,7 +171,7 @@ func ResetPassword(client *supabase.Client) gin.HandlerFunc {
 		}
 
 		data := map[string]interface{}{
-			"password": hashedPassword,
+			"password": hashedNewPassword,
 		}
 
 		_, _, err = client.From("users").Update(data, "", "").Eq("id", strconv.Itoa(userID)).Execute()

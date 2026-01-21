@@ -104,7 +104,7 @@ export default function Navbar() {
                 navigate("/changepassword");
               }}
             >
-              Change Password
+              Reset Password
             </MenuItem>
             <MenuItem
               onClick={() => {
