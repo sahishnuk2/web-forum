@@ -123,7 +123,6 @@ func Login(client *supabase.Client) gin.HandlerFunc {
 	}
 }
 
-// Not done yet, need to get first password and check first before changing password
 func ResetPassword(client *supabase.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user, _ := c.Get("user")
@@ -137,6 +136,11 @@ func ResetPassword(client *supabase.Client) gin.HandlerFunc {
 
 		if err := c.BindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Input"})
+			return
+		}
+
+		if input.Password == input.NewPassword {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "New password cannot be the same as the old password"})
 			return
 		}
 
