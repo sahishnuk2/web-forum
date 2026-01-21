@@ -89,20 +89,21 @@ function ResetPasswordPage() {
           helperText={passwordsNotMatch() ? "Password does not match" : ""}
           className="auth-input"
         />
-
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          className="auth-button"
-          disabled={
-            emptyFields(oldPassword, newPassword, verifiedPassword) ||
-            notFulfillPasswordRequirement() ||
-            passwordsNotMatch()
-          }
-        >
-          {loading ? <CircularProgress sx={{ color: "white" }} /> : "RESET PASSWORD"}
-        </Button>
+        <div className="submissions">
+          <Button type="button" onClick={() => navigate(`/topics`)}>
+            Back
+          </Button>
+          <Button
+            type="submit"
+            disabled={
+              emptyFields(oldPassword, newPassword, verifiedPassword) ||
+              notFulfillPasswordRequirement() ||
+              passwordsNotMatch()
+            }
+          >
+            {loading ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Reset"}
+          </Button>
+        </div>
       </form>
     </div>
   );

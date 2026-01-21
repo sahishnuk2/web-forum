@@ -110,6 +110,7 @@
 .submissions {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
 }
 
 .submissions button {
