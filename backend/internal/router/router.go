@@ -40,6 +40,7 @@ func SetUpRouter() *gin.Engine {
 	router.POST("/api/users/signup", handlers.SignUp(client))
 	router.POST("/api/users/login", handlers.Login(client))
 	router.GET("/api/users/validate", middleware.RequireAuthentication, handlers.Validate)
+	router.PUT("/api/users/changepassword", middleware.RequireAuthentication, handlers.ResetPassword(client))
 	router.POST("/api/users/logout", handlers.LogOut)
 
 	// Topics

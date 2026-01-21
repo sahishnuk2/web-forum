@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -119,6 +120,44 @@ func Login(client *supabase.Client) gin.HandlerFunc {
 				"username": user.Username,
 			},
 		})
+	}
+}
+
+func ResetPassword(client *supabase.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user, _ := c.Get("user")
+		currentUser := user.(User)
+		userID := currentUser.ID
+
+		var input struct {
+			Password string `json:"password" binding:"required,min=8"`
+		}
+
+		if err := c.BindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "New password invalid"})
+			return
+		}
+
+		hashedPassword, err := hashPassword(input.Password)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password"})
+			return
+		}
+
+		data := map[string]interface{}{
+			"password": hashedPassword,
+		}
+
+		_, _, err = client.From("users").Update(data, "", "").Eq("id", strconv.Itoa(userID)).Execute()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to change password"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+
 	}
 }
 
