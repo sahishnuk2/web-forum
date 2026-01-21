@@ -2,14 +2,26 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUsername } from "./Functions";
 import AdbIcon from "@mui/icons-material/Adb";
 import { logOut } from "../../services/api";
+import { Menu, MenuItem } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import { AccountCircle } from "@mui/icons-material";
+import { useState } from "react";
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   async function handleLogout() {
     if (!window.confirm("Are you sure you want to logout")) {
@@ -68,9 +80,41 @@ export default function Navbar() {
           >
             {getCurrentUsername()}
           </Typography>
-          <Button color="inherit" onClick={handleLogout} sx={{ padding: 2 }}>
-            Logout
-          </Button>
+          <IconButton size="large" onClick={handleMenu} color="inherit">
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                navigate("/changepassword");
+              }}
+            >
+              Change Password
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                handleLogout();
+              }}
+            >
+              Logout
+            </MenuItem>
+          </Menu>
         </Toolbar>
       </AppBar>
     </Box>

@@ -81,6 +81,21 @@ export const logOut = async () => {
   return await response.json();
 };
 
+export const resetPassword = async (password: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/changepassword`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({
+      password,
+    }),
+  });
+
+  return handleResponse(response, "Failed to reset password");
+};
+
 // Topics
 export const fetchTopics = async () => {
   const response = await fetch(`${API_BASE_URL}/api/topics`, {
@@ -111,7 +126,7 @@ export const fetchPosts = async (topicId: number) => {
     `${API_BASE_URL}/api/posts?topic_id=${topicId}`,
     {
       credentials: "include",
-    }
+    },
   );
 
   return handleResponse(response, "Failed to retrieve posts");
@@ -128,7 +143,7 @@ export const fetchSinglePost = async (post_id: number) => {
 export const createPost = async (
   topic_id: number,
   title: string,
-  content: string
+  content: string,
 ) => {
   const response = await fetch(`${API_BASE_URL}/api/posts`, {
     method: "POST",
@@ -149,7 +164,7 @@ export const createPost = async (
 export const editPost = async (
   post_id: number,
   title: string,
-  content: string
+  content: string,
 ) => {
   const response = await fetch(`${API_BASE_URL}/api/posts/${post_id}`, {
     method: "PUT",
@@ -190,7 +205,7 @@ export const createPostReaction = async (post_id: number, reaction: number) => {
       body: JSON.stringify({
         reaction,
       }),
-    }
+    },
   );
 
   return handleResponse(response, "Failed to react to post");
@@ -202,7 +217,7 @@ export const fetchComments = async (post_id: number) => {
     `${API_BASE_URL}/api/comments?post_id=${post_id}`,
     {
       credentials: "include",
-    }
+    },
   );
 
   return handleResponse(response, "Failed to retrieve comments");
@@ -261,7 +276,7 @@ export const deleteComment = async (comment_id: number) => {
 
 export const createCommentReaction = async (
   comment_id: number,
-  reaction: number
+  reaction: number,
 ) => {
   const response = await fetch(
     `${API_BASE_URL}/api/comments/${comment_id}/reactions`,
@@ -274,7 +289,7 @@ export const createCommentReaction = async (
       body: JSON.stringify({
         reaction,
       }),
-    }
+    },
   );
 
   return handleResponse(response, "Failed to react to comment");
