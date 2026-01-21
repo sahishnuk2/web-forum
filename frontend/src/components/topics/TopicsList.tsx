@@ -45,15 +45,19 @@ function TopicsList() {
       ) : (
         <div>
           {error && <ErrorMessage error={error} />}
-          {topics.map((topic) => (
-            <TopicCard
-              key={topic.id}
-              id={topic.id}
-              title={topic.title}
-              created_by={topic.created_by}
-              created_at={topic.created_at}
-            />
-          ))}
+          {topics.length == 0 ? (
+            <p>No topics yet</p>
+          ) : (
+            topics.map((topic) => (
+              <TopicCard
+                key={topic.id}
+                id={topic.id}
+                title={topic.title}
+                created_by={topic.created_by}
+                created_at={topic.created_at}
+              />
+            ))
+          )}
         </div>
       )}
     </>
