@@ -5,7 +5,13 @@ import { fetchPosts } from "../../services/api";
 import getCurrentUserId, { handleApiError } from "../common/Functions";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
-import { Box, CircularProgress, MenuItem, Select } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 
 interface PostsListProp {
   topic_id: number;
@@ -18,6 +24,7 @@ function PostsList({ topic_id }: PostsListProp) {
   const [sortBy, setSortBy] = useState<
     "likes" | "net_score" | "newest" | "oldest"
   >("newest");
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,11 +61,18 @@ function PostsList({ topic_id }: PostsListProp) {
     }
   });
 
+  const filteredPosts = [...sortedPosts].filter((post) => {
+    return (
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.content.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
+
   const handleReactionUpdate = (
     postId: number,
     newLikeCount: number,
     newDislikeCount: number,
-    newNetScore: number
+    newNetScore: number,
   ) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
@@ -69,8 +83,8 @@ function PostsList({ topic_id }: PostsListProp) {
               dislike_count: newDislikeCount,
               net_score: newNetScore,
             }
-          : post
-      )
+          : post,
+      ),
     );
   };
 
@@ -100,14 +114,43 @@ function PostsList({ topic_id }: PostsListProp) {
               alignItems: "center",
               marginBottom: 2,
               paddingRight: 2,
+              gap: 2,
             }}
           >
+            <TextField
+              id="outlined-basic"
+              label="Search"
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: "white",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "white",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#005f6e",
+                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "white",
+                },
+              }}
+            />
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               size="small"
               sx={{
-                color: "#006f80",
+                color: "white",
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: "#006f80",
                 },
@@ -118,7 +161,7 @@ function PostsList({ topic_id }: PostsListProp) {
                   borderColor: "#006f80",
                 },
                 "& .MuiSelect-icon": {
-                  color: "#006f80",
+                  color: "white",
                 },
               }}
             >
@@ -128,7 +171,7 @@ function PostsList({ topic_id }: PostsListProp) {
               <MenuItem value="oldest">Oldest First</MenuItem>
             </Select>
           </Box>
-          {sortedPosts.map((post) => (
+          {filteredPosts.map((post) => (
             <PostCard
               key={post.id}
               {...post}
