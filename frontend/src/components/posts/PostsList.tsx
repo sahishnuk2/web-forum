@@ -171,18 +171,22 @@ function PostsList({ topic_id }: PostsListProp) {
               <MenuItem value="oldest">Oldest First</MenuItem>
             </Select>
           </Box>
-          {filteredPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              {...post}
-              onReactionUpdate={handleReactionUpdate}
-              currentUserId={getCurrentUserId()}
-              onDelete={() =>
-                setPosts((prev) => prev.filter((p) => p.id !== post.id))
-              }
-              disableButtons={false}
-            />
-          ))}
+          {filteredPosts.length === 0 ? (
+            <p>No posts yet</p>
+          ) : (
+            filteredPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                {...post}
+                onReactionUpdate={handleReactionUpdate}
+                currentUserId={getCurrentUserId()}
+                onDelete={() =>
+                  setPosts((prev) => prev.filter((p) => p.id !== post.id))
+                }
+                disableButtons={false}
+              />
+            ))
+          )}
         </div>
       )}
     </>

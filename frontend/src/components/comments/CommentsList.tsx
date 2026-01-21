@@ -5,7 +5,7 @@ import { fetchComments } from "../../services/api";
 import getCurrentUserId, { handleApiError } from "../common/Functions";
 import { useNavigate } from "react-router-dom";
 import ErrorMessage from "../common/ErrorMessage";
-import { Box, CircularProgress, MenuItem, Select } from "@mui/material";
+import { Box, CircularProgress, MenuItem, Select, TextField } from "@mui/material";
 
 interface CommentsListProp {
   post_id: number;
@@ -18,6 +18,7 @@ function CommentsList({ post_id }: CommentsListProp) {
   const [sortBy, setSortBy] = useState<
     "likes" | "net_score" | "newest" | "oldest"
   >("newest");
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,6 +53,10 @@ function CommentsList({ post_id }: CommentsListProp) {
           new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
         );
     }
+  });
+
+  const filteredComments = [...sortedComments].filter((comment) => {
+    return comment.content.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
   const handleReactionUpdate = (
@@ -100,14 +105,43 @@ function CommentsList({ post_id }: CommentsListProp) {
               alignItems: "center",
               marginBottom: 2,
               paddingRight: 2,
+              gap: 2,
             }}
           >
+            <TextField
+              id="outlined-basic"
+              label="Search"
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: "white",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "white",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#005f6e",
+                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "white",
+                },
+              }}
+            />
             <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               size="small"
               sx={{
-                color: "#006f80",
+                color: "white",
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: "#006f80",
                 },
@@ -118,7 +152,7 @@ function CommentsList({ post_id }: CommentsListProp) {
                   borderColor: "#006f80",
                 },
                 "& .MuiSelect-icon": {
-                  color: "#006f80",
+                  color: "white",
                 },
               }}
             >
@@ -128,17 +162,21 @@ function CommentsList({ post_id }: CommentsListProp) {
               <MenuItem value="oldest">Oldest First</MenuItem>
             </Select>
           </Box>
-          {sortedComments.map((comment) => (
-            <CommentCard
-              key={comment.id}
-              {...comment}
-              onReactionUpdate={handleReactionUpdate}
-              currentUserId={getCurrentUserId()}
-              onDelete={() =>
-                setComments((prev) => prev.filter((c) => c.id !== comment.id))
-              }
-            />
-          ))}
+          {filteredComments.length === 0 ? (
+            <p>No comments yet</p>
+          ) : (
+            filteredComments.map((comment) => (
+              <CommentCard
+                key={comment.id}
+                {...comment}
+                onReactionUpdate={handleReactionUpdate}
+                currentUserId={getCurrentUserId()}
+                onDelete={() =>
+                  setComments((prev) => prev.filter((c) => c.id !== comment.id))
+                }
+              />
+            ))
+          )}
         </div>
       )}
     </>
