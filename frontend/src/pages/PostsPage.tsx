@@ -11,24 +11,35 @@ function PostsPage() {
   return (
     <>
       <div className="top">
-        <Button
-          startIcon={<ArrowBackIcon />}
-          sx={{ color: "#006f80" }}
-          onClick={() => navigate("/topics")}
-        />
+        <div style={{ flex: 1, display: "flex", justifyContent: "flex-start" }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            sx={{ color: "#006f80" }}
+            onClick={() => navigate("/topics")}
+          />
+        </div>
         <h1>Posts</h1>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => navigate("create")}
-          sx={{
-            margin: 1,
-            backgroundColor: "#006f80",
-            "&:hover": { backgroundColor: "#005f6e" },
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: 10,
           }}
         >
-          New Post
-        </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate("create")}
+            sx={{
+              margin: 1,
+              backgroundColor: "#006f80",
+              "&:hover": { backgroundColor: "#005f6e" },
+            }}
+          >
+            New Post
+          </Button>
+        </div>
       </div>
       <PostsList topic_id={topicId} />
     </>

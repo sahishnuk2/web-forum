@@ -9,21 +9,29 @@ function TopicsPage() {
   return (
     <>
       <div className="top">
-        <Button disabled></Button>
-        {/* Above button is just for spacing */}
+        <div style={{ flex: 1 }}></div>
         <h1>Topics</h1>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => navigate("create")}
-          sx={{
-            margin: 1,
-            backgroundColor: "#006f80",
-            "&:hover": { backgroundColor: "#005f6e" },
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: 10,
           }}
         >
-          New Topic
-        </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate("create")}
+            sx={{
+              margin: 1,
+              backgroundColor: "#006f80",
+              "&:hover": { backgroundColor: "#005f6e" },
+            }}
+          >
+            New Topic
+          </Button>
+        </div>
       </div>
       <TopicsList></TopicsList>
     </>

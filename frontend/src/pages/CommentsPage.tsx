@@ -41,24 +41,35 @@ function CommentsPage() {
   return (
     <>
       <div className="top">
-        <Button
-          startIcon={<ArrowBackIcon />}
-          sx={{ color: "#006f80" }}
-          onClick={() => navigate(`/topics/${topicId}`)}
-        />
+        <div style={{ flex: 1, display: "flex", justifyContent: "flex-start" }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            sx={{ color: "#006f80" }}
+            onClick={() => navigate(`/topics/${topicId}`)}
+          />
+        </div>
         <h1>Comments</h1>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => navigate("create")}
-          sx={{
-            margin: 1,
-            backgroundColor: "#006f80",
-            "&:hover": { backgroundColor: "#005f6e" },
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "flex-end",
+            marginRight: 10,
           }}
         >
-          New Comment
-        </Button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => navigate("create")}
+            sx={{
+              margin: 1,
+              backgroundColor: "#006f80",
+              "&:hover": { backgroundColor: "#005f6e" },
+            }}
+          >
+            New Comment
+          </Button>
+        </div>
       </div>
       <div className="comments-post">
         {loading ? (
