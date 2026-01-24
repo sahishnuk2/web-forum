@@ -12,7 +12,7 @@
 - Create/Edit/Delete comments
 - Likes/Dislikes for posts and comments
 - Sorting (Popular (`Likes - Dislikes`), Most Liked, Newest, Oldest)
-- Search for posts and comments
+- Search for topics, posts and comments
 - Reset password
 
 ## Tech Stack
