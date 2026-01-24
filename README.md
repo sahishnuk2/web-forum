@@ -1,21 +1,25 @@
 # Web Forum
 
-**Name:** Sahishnu Kumaar
+**Name:** Obula Saravanakumar Sahishnu Kumaar
 
 **Deployed Website:** [forum.sahishnu.dev](https://forum.sahishnu.dev)
 
 ## Features
 
+- User authentication (Login/Signup/Logout) with persistent sessions
 - Create topics
 - Create/Edit/Delete posts
 - Create/Edit/Delete comments
-- User authentication (Login/Signup/Logout)
+- Likes/Dislikes for posts and comments
+- Sorting (Popular (`Likes - Dislikes`), Most Liked, Newest, Oldest)
+- Search for posts and comments
+- Reset password
 
 ## Tech Stack
 
 **Frontend:**
 
-- React 18
+- React
 - TypeScript
 - Material-UI (MUI)
 - React Router
@@ -23,7 +27,7 @@
 
 **Backend:**
 
-- Go 1.21+
+- Go
 - Gin Web Framework
 - PostgreSQL (Supabase)
 - JWT Authentication
@@ -45,8 +49,9 @@ cd backend
 go mod download
 
 # Create .env file with:
+# SUPABASE_URL=your-supabase-url
+# SUPABASE_KEY=your-supabase-key
 # JWT_SECRET=your-secret-key
-# DATABASE_URL=your-supabase-connection-string
 # ENVIRONMENT=development
 
 go run cmd/main.go
@@ -66,9 +71,9 @@ npm run dev
 
 4. Access the application at `http://localhost:5173`
 
-## Future Enhancements
+## AI Usage
 
-- Likes feature for posts and comments
-- Search functionality for topics/posts
-- Sort logic (by date, popularity, etc.)
-- User profile page
+This project was developed with assistance from Claude Code (Anthropic's CLI tool). Claude helped with:
+
+- Code review and best practice suggestions
+- Learning and understanding concepts (JWT authentication, CORS, bcrypt hashing)
