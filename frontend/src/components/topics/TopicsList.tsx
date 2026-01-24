@@ -5,13 +5,18 @@ import ErrorMessage from "../common/ErrorMessage";
 import { handleApiError } from "../common/Functions";
 import TopicCard from "./TopicCard";
 import { useEffect, useState } from "react";
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, TextField } from "@mui/material";
 
 function TopicsList() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
+  const filteredTopics = [...topics].filter((topic) => {
+    return topic.title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -45,10 +50,48 @@ function TopicsList() {
       ) : (
         <div>
           {error && <ErrorMessage error={error} />}
-          {topics.length == 0 ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              marginBottom: 2,
+              paddingRight: 2,
+            }}
+          >
+            <TextField
+              id="outlined-basic"
+              label="Search"
+              variant="outlined"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="small"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: "white",
+                },
+                "& .MuiInputLabel-root": {
+                  color: "white",
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#005f6e",
+                },
+                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#006f80",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "white",
+                },
+              }}
+            />
+          </Box>
+          {filteredTopics.length === 0 ? (
             <p>No topics yet</p>
           ) : (
-            topics.map((topic) => (
+            filteredTopics.map((topic) => (
               <TopicCard
                 key={topic.id}
                 id={topic.id}
